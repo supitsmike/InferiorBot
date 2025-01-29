@@ -17,6 +17,7 @@ namespace InferiorBot
         {
             client.Log += OnLogAsync;
             client.Ready += OnReadyAsync;
+            client.MessageDeleted += OnMessageDeletedAsync;
             client.MessageReceived += OnMessageReceivedAsync;
             client.InteractionCreated += OnInteractionCreatedAsync;
 
@@ -36,6 +37,11 @@ namespace InferiorBot
         private Task OnReadyAsync()
         {
             return mediator.Publish(new ReadyNotification(handler, services), _cancellationToken);
+        }
+
+        private Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> message, Cacheable<IMessageChannel, ulong> messageChannel)
+        {
+            return mediator.Publish(new MessageDeletedNotification(message, messageChannel, context), _cancellationToken);
         }
 
         private Task OnMessageReceivedAsync(SocketMessage message)
