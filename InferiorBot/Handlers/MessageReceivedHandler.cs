@@ -4,6 +4,7 @@ using InferiorBot.Classes;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Handlers
 {
@@ -20,11 +21,26 @@ namespace InferiorBot.Handlers
             if (notification.Message is not SocketUserMessage message) return;
             if (message.Author.IsBot) return;
             if (message.Content.IsValidUrl() == false) return;
-            if (message.Channel is SocketGuildChannel channel)
+
+            var context = notification.Context;
+            var user = await message.Author.GetUserDataAsync(context, cancellationToken);
+
+            var channel = message.Channel as SocketGuildChannel;
+            if (channel != null)
             {
-                var context = notification.Context;
-                var guildData = await channel.Guild.GetGuildDataAsync(context);
+                var guildData = await channel.Guild.GetGuildDataAsync(context, cancellationToken);
                 if (guildData.ConvertUrls == false) return;
+
+                var url = new Uri(message.Content).RemoveQuery();
+                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == channel.Guild.Id && x.ChannelId == channel.Id && x.OriginalUrl == url, cancellationToken);
+                if (previousMessage != null)
+                {
+                    await message.Channel.SendMessageAsync(previousMessage.UserId == user.UserId
+                        ? $"Buddy... You already posted this {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}"
+                        : $"{DiscordFormatter.Mention(message.Author)}, this was already posted {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}");
+                    await message.DeleteAsync();
+                    return;
+                }
             }
             else if (message.Channel is not SocketDMChannel) return;
 
@@ -65,8 +81,24 @@ namespace InferiorBot.Handlers
             }
             var components = componentBuilder.Build();
 
-            await message.ReplyAsync($"{DiscordFormatter.Mention(message.Author)}: {convertedUrl}", components: components);
-            if (message.Channel is SocketGuildChannel) await message.DeleteAsync();
+            var replyMessage = await message.Channel.SendMessageAsync($"{DiscordFormatter.Mention(message.Author)}: {convertedUrl}", components: components);
+            if (message.Channel is SocketDMChannel) return;
+
+            await message.DeleteAsync();
+            if (channel != null)
+            {
+                var newPost = new ConvertedUrl
+                {
+                    GuildId = channel.Guild.Id,
+                    ChannelId = channel.Id,
+                    MessageId = replyMessage.Id,
+                    UserId = user.UserId,
+                    OriginalUrl = new Uri(message.Content).RemoveQuery(),
+                    DatePosted = message.Timestamp.DateTime.ToLocalTime()
+                };
+                await context.ConvertedUrls.AddAsync(newPost, cancellationToken);
+                if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }

@@ -7,15 +7,19 @@ namespace Infrastructure.InferiorBot;
 
 public partial class ConvertedUrl
 {
+    public decimal GuildId { get; set; }
+
+    public decimal ChannelId { get; set; }
+
     public decimal MessageId { get; set; }
 
     public decimal UserId { get; set; }
 
     public string OriginalUrl { get; set; }
 
-    public string ConvertedUrl1 { get; set; }
+    public DateTime DatePosted { get; set; }
 
-    public DateOnly DatePosted { get; set; }
+    public virtual Guild Guild { get; set; }
 
     public virtual User User { get; set; }
 }

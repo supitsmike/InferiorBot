@@ -31,7 +31,7 @@ namespace InferiorBot.Handlers
             var interactionContext = new SocketInteractionContext(client, interaction);
             if (interactionContext.Interaction is ISlashCommandInteraction)
             {
-                var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext);
+                var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext, cancellationToken);
                 var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => guildData.BotChannels != null && guildData.BotChannels.Contains(channel.Id));
                 if (channel != null && channel.Id != interactionContext.Channel.Id)
                 {
