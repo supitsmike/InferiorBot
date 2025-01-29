@@ -2,10 +2,12 @@
 using Discord.Interactions;
 using InferiorBot.Classes;
 using InferiorBot.Extensions;
+using Infrastructure.InferiorBot;
+using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Modules
 {
-    public class MessageComponentModule : InteractionModuleBase<SocketInteractionContext>
+    public class MessageComponentModule(InferiorBotContext context) : InteractionModuleBase<SocketInteractionContext>
     {
         [ComponentInteraction("convert_url:*")]
         public async Task ConvertUrl(string type)
@@ -42,7 +44,13 @@ namespace InferiorBot.Modules
                 return;
             }
 
-            await componentInteraction.Message.DeleteAsync();
+            var previousPost = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == interaction.GuildId && x.ChannelId == interaction.ChannelId && x.MessageId == interaction.Message.Id);
+            if (previousPost != null)
+            {
+                context.ConvertedUrls.Remove(previousPost);
+                if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync();
+            }
+
             await interaction.Message.DeleteAsync();
         }
     }
