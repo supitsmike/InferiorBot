@@ -19,5 +19,10 @@
 
             return string.Empty;
         }
+
+        public static string RemoveQuery(this Uri uri)
+        {
+            return $"{new UriBuilder(uri) { Host = uri.Host, Query = string.Empty, Port = -1 }}";
+        }
     }
 }
