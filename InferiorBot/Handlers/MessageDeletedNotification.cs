@@ -19,18 +19,13 @@ namespace InferiorBot.Handlers
         public async Task Handle(MessageDeletedNotification notification, CancellationToken cancellationToken)
         {
             var context = notification.Context;
-            var message = await notification.Message.GetOrDownloadAsync();
-            if (message == null) return;
+            var messageId = notification.Message.Id;
+            var channelId = notification.MessageChannel.Id;
 
-            var convertSplit = message.Content.Split(": ");
-            if (convertSplit.Length != 2) return;
-            var url = convertSplit[1];
-            if (!url.IsValidUrl()) return;
-
-            var previousPost = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.ChannelId == message.Channel.Id && x.MessageId == message.Id, cancellationToken);
-            if (previousPost != null)
+            var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.ChannelId == channelId && x.MessageId == messageId, cancellationToken);
+            if (previousMessage != null)
             {
-                context.ConvertedUrls.Remove(previousPost);
+                context.ConvertedUrls.Remove(previousMessage);
                 if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync(cancellationToken);
             }
         }
