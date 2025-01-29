@@ -23,6 +23,8 @@ namespace InferiorBot.Handlers
             if (message.Content.IsValidUrl() == false) return;
 
             var context = notification.Context;
+            var user = await message.Author.GetUserDataAsync(context, cancellationToken);
+
             var channel = message.Channel as SocketGuildChannel;
             if (channel != null)
             {
@@ -30,17 +32,14 @@ namespace InferiorBot.Handlers
                 if (guildData.ConvertUrls == false) return;
 
                 var url = new Uri(message.Content).RemoveQuery();
-                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == channel.Guild.Id && x.OriginalUrl == url, cancellationToken);
-                if (previousMessage != null && previousMessage.GuildId == channel.Guild.Id && previousMessage.ChannelId == channel.Id)
+                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == channel.Guild.Id && x.ChannelId == channel.Id && x.OriginalUrl == url, cancellationToken);
+                if (previousMessage != null)
                 {
-                    if (channel.Guild.Channels.FirstOrDefault(x => x.Id == previousMessage.ChannelId && x.Users.Contains(message.Author)) != null)
-                    {
-                        await message.ReplyAsync(previousMessage.UserId == message.Author.Id
-                            ? $"Buddy... You already posted this {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}"
-                            : $"<@{previousMessage.UserId}> already posted this {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}");
-                        await message.DeleteAsync();
-                        return;
-                    }
+                    await message.Channel.SendMessageAsync(previousMessage.UserId == user.UserId
+                        ? $"Buddy... You already posted this {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}"
+                        : $"{DiscordFormatter.Mention(message.Author)}, this was already posted {DiscordFormatter.Timestamp(previousMessage.DatePosted)}: https://discord.com/channels/{previousMessage.GuildId}/{previousMessage.ChannelId}/{previousMessage.MessageId}");
+                    await message.DeleteAsync();
+                    return;
                 }
             }
             else if (message.Channel is not SocketDMChannel) return;
@@ -82,7 +81,7 @@ namespace InferiorBot.Handlers
             }
             var components = componentBuilder.Build();
 
-            var replyMessage = await message.ReplyAsync($"{DiscordFormatter.Mention(message.Author)}: {convertedUrl}", components: components);
+            var replyMessage = await message.Channel.SendMessageAsync($"{DiscordFormatter.Mention(message.Author)}: {convertedUrl}", components: components);
             if (message.Channel is SocketDMChannel) return;
 
             await message.DeleteAsync();
@@ -93,8 +92,8 @@ namespace InferiorBot.Handlers
                     GuildId = channel.Guild.Id,
                     ChannelId = channel.Id,
                     MessageId = replyMessage.Id,
-                    UserId = message.Author.Id,
-                    OriginalUrl = message.Content,
+                    UserId = user.UserId,
+                    OriginalUrl = new Uri(message.Content).RemoveQuery(),
                     DatePosted = message.Timestamp.DateTime.ToLocalTime()
                 };
                 await context.ConvertedUrls.AddAsync(newPost, cancellationToken);
