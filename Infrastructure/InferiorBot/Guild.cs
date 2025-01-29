@@ -14,4 +14,6 @@ public partial class Guild
     public decimal[] DjRoles { get; set; }
 
     public bool ConvertUrls { get; set; }
+
+    public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 }

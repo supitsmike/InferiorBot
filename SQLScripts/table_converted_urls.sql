@@ -4,14 +4,18 @@
 
 CREATE TABLE IF NOT EXISTS public.converted_urls
 (
+    guild_id numeric(19,0) NOT NULL,
+    channel_id numeric(19,0) NOT NULL,
     message_id numeric(19,0) NOT NULL,
     user_id numeric(19,0) NOT NULL,
     original_url character varying(2048) COLLATE pg_catalog."default" NOT NULL,
-    converted_url character varying(2048) COLLATE pg_catalog."default" NOT NULL,
-    date_posted date NOT NULL,
-    CONSTRAINT converted_urls_pkey PRIMARY KEY (message_id),
-    CONSTRAINT converted_urls_message_id_key UNIQUE (message_id),
-    CONSTRAINT converted_urls_user_id_fkey FOREIGN KEY (user_id)
+    date_posted timestamp without time zone NOT NULL,
+    CONSTRAINT converted_urls_pkey1 PRIMARY KEY (guild_id, channel_id, message_id),
+    CONSTRAINT converted_urls_guild_id_fkey FOREIGN KEY (guild_id)
+        REFERENCES public.guilds (guild_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT converted_urls_user_id_fkey1 FOREIGN KEY (user_id)
         REFERENCES public.users (user_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION

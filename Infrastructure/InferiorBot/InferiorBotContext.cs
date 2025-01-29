@@ -23,20 +23,22 @@ public partial class InferiorBotContext : DbContext
     {
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
-            entity.HasKey(e => e.MessageId).HasName("converted_urls_pkey");
+            entity.HasKey(e => new { e.GuildId, e.ChannelId, e.MessageId }).HasName("converted_urls_pkey1");
 
             entity.ToTable("converted_urls");
 
-            entity.HasIndex(e => e.MessageId, "converted_urls_message_id_key").IsUnique();
-
+            entity.Property(e => e.GuildId)
+                .HasPrecision(19)
+                .HasColumnName("guild_id");
+            entity.Property(e => e.ChannelId)
+                .HasPrecision(19)
+                .HasColumnName("channel_id");
             entity.Property(e => e.MessageId)
                 .HasPrecision(19)
                 .HasColumnName("message_id");
-            entity.Property(e => e.ConvertedUrl1)
-                .IsRequired()
-                .HasMaxLength(2048)
-                .HasColumnName("converted_url");
-            entity.Property(e => e.DatePosted).HasColumnName("date_posted");
+            entity.Property(e => e.DatePosted)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("date_posted");
             entity.Property(e => e.OriginalUrl)
                 .IsRequired()
                 .HasMaxLength(2048)
@@ -45,10 +47,15 @@ public partial class InferiorBotContext : DbContext
                 .HasPrecision(19)
                 .HasColumnName("user_id");
 
+            entity.HasOne(d => d.Guild).WithMany(p => p.ConvertedUrls)
+                .HasForeignKey(d => d.GuildId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("converted_urls_guild_id_fkey");
+
             entity.HasOne(d => d.User).WithMany(p => p.ConvertedUrls)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("converted_urls_user_id_fkey");
+                .HasConstraintName("converted_urls_user_id_fkey1");
         });
 
         modelBuilder.Entity<Guild>(entity =>
