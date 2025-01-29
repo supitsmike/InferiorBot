@@ -22,8 +22,7 @@ namespace InferiorBot.Handlers
             if (message.Content.IsValidUrl() == false) return;
             if (message.Channel is SocketGuildChannel channel)
             {
-                var context = notification.Context;
-                var guildData = await channel.Guild.GetGuildDataAsync(context);
+                var guildData = await channel.Guild.GetGuildDataAsync(context, cancellationToken);
                 if (guildData.ConvertUrls == false) return;
             }
             else if (message.Channel is not SocketDMChannel) return;
