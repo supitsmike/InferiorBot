@@ -6,7 +6,7 @@ namespace InferiorBot.Extensions
 {
     public static class SocketUserExtension
     {
-        public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, CancellationToken cancellationToken)
+        public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, CancellationToken cancellationToken = default)
         {
             var userData = await context.Users.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
             if (userData == null)
