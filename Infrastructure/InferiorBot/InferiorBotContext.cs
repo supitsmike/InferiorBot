@@ -70,10 +70,14 @@ public partial class InferiorBotContext : DbContext
                 .HasPrecision(19)
                 .HasColumnName("guild_id");
             entity.Property(e => e.BotChannels)
+                .IsRequired()
+                .HasDefaultValueSql("ARRAY[]::numeric[]")
                 .HasColumnType("numeric(19,0)[]")
                 .HasColumnName("bot_channels");
             entity.Property(e => e.ConvertUrls).HasColumnName("convert_urls");
             entity.Property(e => e.DjRoles)
+                .IsRequired()
+                .HasDefaultValueSql("ARRAY[]::numeric[]")
                 .HasColumnType("numeric(19,0)[]")
                 .HasColumnName("dj_roles");
         });
