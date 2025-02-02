@@ -6,14 +6,17 @@ namespace InferiorBot.Extensions
 {
     public static class SocketGuildExtension
     {
-        public static async Task<Guild> GetGuildDataAsync(this SocketGuild guild, InferiorBotContext context, CancellationToken cancellationToken)
+        public static async Task<Guild> GetGuildDataAsync(this SocketGuild guild, InferiorBotContext context, CancellationToken cancellationToken = default)
         {
             var guildData = await context.Guilds.FirstOrDefaultAsync(x => x.GuildId == guild.Id, cancellationToken);
             if (guildData == null)
             {
                 guildData = new Guild
                 {
-                    GuildId = guild.Id
+                    GuildId = guild.Id,
+                    BotChannels = [],
+                    DjRoles = [],
+                    ConvertUrls = false
                 };
                 await context.Guilds.AddAsync(guildData, cancellationToken);
                 if (!context.ChangeTracker.HasChanges()) throw new ApplicationException("Failed to add guild to database.");
