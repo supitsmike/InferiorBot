@@ -25,5 +25,10 @@ namespace InferiorBot.Extensions
             await context.Entry(userData).ReloadAsync(cancellationToken);
             return userData;
         }
+
+        public static string GetUserName(this SocketUser user)
+        {
+            return $"{user.Username}{(user.Discriminator != "0000" ? $"#{user.Discriminator}" : string.Empty)}";
+        }
     }
 }
