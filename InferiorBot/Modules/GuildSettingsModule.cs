@@ -18,7 +18,7 @@ namespace InferiorBot.Modules
             private readonly InferiorBotContext _context = context;
 
             [SlashCommand("allow-url-convert", "Allow or disallow the bot to convert social media urls so they embed properly.")]
-            public async Task AllowUrlConvertCommand([Summary(description: "Do you want to allow the bot to convert urls?")] bool value)
+            public async Task AllowUrlConvert([Summary(description: "Do you want to allow the bot to convert urls?")] bool value)
             {
                 if (GuildData.ConvertUrls == value)
                 {
@@ -38,7 +38,7 @@ namespace InferiorBot.Modules
             }
 
             [SlashCommand("bot-channel", "Set the channel you want to use as a bot commands channel.")]
-            public async Task AddBotChannelCommand([Summary(description: "The channel you want to use as a bot commands channel.")] SocketChannel channel)
+            public async Task AddBotChannel([Summary(description: "The channel you want to use as a bot commands channel.")] SocketChannel channel)
             {
                 var botChannels = GuildData.BotChannels.ToList();
                 if (botChannels.Contains(channel.Id))
@@ -60,7 +60,7 @@ namespace InferiorBot.Modules
             }
 
             [SlashCommand("dj-role", "Set the role you want to allow to use the music commands.")]
-            public async Task AddDjRoleCommand([Summary(description: "The role you want to allow use of music commands.")] SocketRole role)
+            public async Task AddDjRole([Summary(description: "The role you want to allow use of music commands.")] SocketRole role)
             {
                 var djRoles = GuildData.DjRoles.ToList();
                 if (djRoles.Contains(role.Id))
@@ -88,7 +88,7 @@ namespace InferiorBot.Modules
             private readonly InferiorBotContext _context = context;
 
             [SlashCommand("bot-channel", "Remove the channel you wanted to be used as a bot commands channel.")]
-            public async Task RemoveBotChannelCommand([Summary(description: "The channel you want to remove as a bot commands channel.")] SocketChannel? channel = null)
+            public async Task RemoveBotChannel([Summary(description: "The channel you want to remove as a bot commands channel.")] SocketChannel? channel = null)
             {
                 var botChannels = GuildData.BotChannels.ToList();
                 if (botChannels.Count == 0)
@@ -119,7 +119,7 @@ namespace InferiorBot.Modules
             }
 
             [SlashCommand("dj-role", "Remove the role you wanted to allow to use the music commands.")]
-            public async Task RemoveDjRoleCommand([Summary(description: "The role you want to remove DJ permission from.")] SocketRole? role = null)
+            public async Task RemoveDjRole([Summary(description: "The role you want to remove DJ permission from.")] SocketRole? role = null)
             {
                 var djRoles = GuildData.DjRoles.ToList();
                 if (djRoles.Count == 0)
