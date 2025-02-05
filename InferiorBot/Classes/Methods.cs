@@ -1,4 +1,5 @@
 ﻿using InferiorBot.Extensions;
+using System.Security.Cryptography;
 
 namespace InferiorBot.Classes
 {
