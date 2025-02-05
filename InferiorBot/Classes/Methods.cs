@@ -194,5 +194,17 @@ namespace InferiorBot.Classes
 
             return $"{new UriBuilder(uri) { Host = $"{subdomain}{(subdomain.Length > 0 ? "." : string.Empty)}{host}", Query = string.Empty, Port = -1}}";
         }
+
+        public static int GenerateRandomNumber(int minValue, int maxValue = -1)
+        {
+            var randomBytes = new byte[sizeof(int)];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+
+            var seed = BitConverter.ToInt32(randomBytes, 0);
+            return maxValue != -1 ? new Random(seed).Next(minValue, maxValue + 1) : new Random(seed).Next(minValue);
+        }
     }
 }
