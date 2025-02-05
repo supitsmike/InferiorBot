@@ -13,7 +13,9 @@ namespace InferiorBot.Extensions
             {
                 userData = new User
                 {
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Balance = 100,
+                    Banned = false
                 };
                 await context.Users.AddAsync(userData, cancellationToken);
                 if (!context.ChangeTracker.HasChanges()) throw new ApplicationException("Failed to add user to database.");

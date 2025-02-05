@@ -1,5 +1,4 @@
 ﻿using Discord;
-using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

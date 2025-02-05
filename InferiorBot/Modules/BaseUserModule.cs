@@ -1,9 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Interactions;
-using InferiorBot.Classes;
+﻿using Discord.Interactions;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
+using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Modules
 {
@@ -11,6 +9,7 @@ namespace InferiorBot.Modules
     {
         protected Guild GuildData = null!;
         protected User UserData = null!;
+        protected List<ConvertedUrl> ConvertedUrls = null!;
 
         protected string? AuthorName;
         protected string? AuthorIconUrl;
@@ -22,7 +21,8 @@ namespace InferiorBot.Modules
 
             GuildData = await Context.Guild.GetGuildDataAsync(context);
             UserData = await Context.User.GetUserDataAsync(context);
-            
+            ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == Context.Guild.Id && x.ChannelId == Context.Channel.Id).ToListAsync();
+
             await base.BeforeExecuteAsync(command);
         }
     }
