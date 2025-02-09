@@ -24,6 +24,7 @@ namespace InferiorBot.Handlers
 
             var context = notification.Context;
             var user = await message.Author.GetUserDataAsync(context, cancellationToken);
+            if (user.Banned) return;
 
             var channel = message.Channel as SocketGuildChannel;
             if (channel != null)
