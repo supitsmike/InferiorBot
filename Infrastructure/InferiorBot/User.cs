@@ -13,5 +13,7 @@ public partial class User
 
     public bool Banned { get; set; }
 
+    public DateTime? DailyCooldown { get; set; }
+
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 }
