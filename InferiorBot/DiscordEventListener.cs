@@ -46,7 +46,7 @@ namespace InferiorBot
 
         private Task OnMessageReceivedAsync(SocketMessage message)
         {
-            return mediator.Publish(new MessageReceivedNotification(message, context), _cancellationToken);
+            return mediator.Publish(new MessageReceivedNotification(message, context, services), _cancellationToken);
         }
 
         private Task OnInteractionCreatedAsync(SocketInteraction interaction)

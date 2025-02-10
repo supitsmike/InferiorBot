@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Modules
 {
-    public class BaseUserModule(InferiorBotContext context) : InteractionModuleBase<SocketInteractionContext>
+    public class BaseUserModule(InferiorBotContext context, IServiceProvider services) : InteractionModuleBase<SocketInteractionContext>
     {
         protected Guild GuildData = null!;
         protected User UserData = null!;

@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Handlers
 {
-    public class MessageReceivedNotification(SocketMessage message, InferiorBotContext context) : INotification
+    public class MessageReceivedNotification(SocketMessage message, InferiorBotContext context, IServiceProvider services) : INotification
     {
         public SocketMessage Message { get; } = message ?? throw new ArgumentNullException(nameof(message));
         public InferiorBotContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
+        public IServiceProvider Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
     }
 
     public class MessageReceivedHandler : INotificationHandler<MessageReceivedNotification>

@@ -13,7 +13,7 @@ namespace InferiorBot.Modules
     public class GuildSettingsModule : InteractionModuleBase<SocketInteractionContext>
     {
         [Group("set", "Set a guild settings within the bot.")]
-        public class SetGuildSettings(InferiorBotContext context) : BaseUserModule(context)
+        public class SetGuildSettings(InferiorBotContext context, IServiceProvider services) : BaseUserModule(context, services)
         {
             private readonly InferiorBotContext _context = context;
 
@@ -79,7 +79,7 @@ namespace InferiorBot.Modules
         }
 
         [Group("remove", "Remove a guild settings within the bot.")]
-        public class RemoveGuildSettings(InferiorBotContext context) : BaseUserModule(context)
+        public class RemoveGuildSettings(InferiorBotContext context, IServiceProvider services) : BaseUserModule(context, services)
         {
             private readonly InferiorBotContext _context = context;
 
