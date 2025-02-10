@@ -40,15 +40,13 @@ namespace InferiorBot.Modules
             [SlashCommand("bot-channel", "Set the channel you want to use as a bot commands channel.")]
             public async Task AddBotChannel([Summary(description: "The channel you want to use as a bot commands channel.")] SocketChannel channel)
             {
-                var botChannels = GuildData.BotChannels.ToList();
-                if (botChannels.Contains(channel.Id))
+                if (GuildData.BotChannels.Contains(channel.Id))
                 {
                     await RespondAsync($"Channel {DiscordFormatter.Mention(channel)} is already set as a bot commands channel.", ephemeral: true);
                     return;
                 }
 
-                botChannels.Add(channel.Id);
-                GuildData.BotChannels = botChannels.ToArray();
+                GuildData.BotChannels.Add(channel.Id);
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -62,15 +60,13 @@ namespace InferiorBot.Modules
             [SlashCommand("dj-role", "Set the role you want to allow to use the music commands.")]
             public async Task AddDjRole([Summary(description: "The role you want to allow use of music commands.")] SocketRole role)
             {
-                var djRoles = GuildData.DjRoles.ToList();
-                if (djRoles.Contains(role.Id))
+                if (GuildData.DjRoles.Contains(role.Id))
                 {
                     await RespondAsync($"Role {DiscordFormatter.Mention(role)} is already set a DJ role", ephemeral: true);
                     return;
                 }
 
-                djRoles.Add(role.Id);
-                GuildData.DjRoles = djRoles.ToArray();
+                GuildData.DjRoles.Add(role.Id);
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -90,22 +86,20 @@ namespace InferiorBot.Modules
             [SlashCommand("bot-channel", "Remove the channel you wanted to be used as a bot commands channel.")]
             public async Task RemoveBotChannel([Summary(description: "The channel you want to remove as a bot commands channel.")] SocketChannel? channel = null)
             {
-                var botChannels = GuildData.BotChannels.ToList();
-                if (botChannels.Count == 0)
+                if (GuildData.BotChannels.Count == 0)
                 {
                     await RespondAsync("There are currently no bot commands channel set.", ephemeral: true);
                     return;
                 }
-                if (channel != null && botChannels.Find(x => x == channel.Id) == default)
+                if (channel != null && GuildData.BotChannels.Find(x => x == channel.Id) == default)
                 {
                     await RespondAsync("This channel is not currently set as a bot commands channel.", ephemeral: true);
                     return;
                 }
 
-                if (channel == null) botChannels.Clear();
-                else botChannels.Remove(channel.Id);
+                if (channel == null) GuildData.BotChannels.Clear();
+                else GuildData.BotChannels.Remove(channel.Id);
 
-                GuildData.BotChannels = botChannels.ToArray();
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -114,29 +108,27 @@ namespace InferiorBot.Modules
                 await _context.SaveChangesAsync();
 
                 await RespondAsync(
-                    $"Removed {(channel == null ? "all channels" : DiscordFormatter.Mention(channel))} as a bot commands channel from guild. {(GuildData.BotChannels.Length == 0 ? "Now any channel can be used to do bot commands." : string.Empty)}",
+                    $"Removed {(channel == null ? "all channels" : DiscordFormatter.Mention(channel))} as a bot commands channel from guild. {(GuildData.BotChannels.Count == 0 ? "Now any channel can be used to do bot commands." : string.Empty)}",
                     ephemeral: true);
             }
 
             [SlashCommand("dj-role", "Remove the role you wanted to allow to use the music commands.")]
             public async Task RemoveDjRole([Summary(description: "The role you want to remove DJ permission from.")] SocketRole? role = null)
             {
-                var djRoles = GuildData.DjRoles.ToList();
-                if (djRoles.Count == 0)
+                if (GuildData.DjRoles.Count == 0)
                 {
                     await RespondAsync("There are currently no DJ roles set.", ephemeral: true);
                     return;
                 }
-                if (role != null && djRoles.Find(x => x == role.Id) == default)
+                if (role != null && GuildData.DjRoles.Find(x => x == role.Id) == default)
                 {
                     await RespondAsync("This role is not currently set to have DJ permissions.", ephemeral: true);
                     return;
                 }
 
-                if (role == null) djRoles.Clear();
-                else djRoles.Remove(role.Id);
+                if (role == null) GuildData.DjRoles.Clear();
+                else GuildData.DjRoles.Remove(role.Id);
 
-                GuildData.DjRoles = djRoles.ToArray();
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -145,7 +137,7 @@ namespace InferiorBot.Modules
                 await _context.SaveChangesAsync();
                 
                 await RespondAsync(
-                    $"Removed DJ permission form {(role == null ? "all roles" : DiscordFormatter.Mention(role))} in guild. {(GuildData.DjRoles.Length == 0 ? "Now anyone can use the music settings." : string.Empty)}",
+                    $"Removed DJ permission form {(role == null ? "all roles" : DiscordFormatter.Mention(role))} in guild. {(GuildData.DjRoles.Count == 0 ? "Now anyone can use the music settings." : string.Empty)}",
                     ephemeral: true);
             }
         }
