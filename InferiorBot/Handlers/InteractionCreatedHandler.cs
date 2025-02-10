@@ -80,7 +80,7 @@ namespace InferiorBot.Handlers
                     break;
             }
 
-            await interaction.RespondAsync("Something went wrong.", ephemeral: true).ConfigureAwait(false);
+            await interaction.RespondAsync("Something went wrong.", ephemeral: true);
         }
     }
 }
