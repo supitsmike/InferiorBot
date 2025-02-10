@@ -74,7 +74,9 @@ public partial class InferiorBotContext : DbContext
                 .HasDefaultValueSql("ARRAY[]::numeric[]")
                 .HasColumnType("numeric(19,0)[]")
                 .HasColumnName("bot_channels");
-            entity.Property(e => e.ConvertUrls).HasColumnName("convert_urls");
+            entity.Property(e => e.ConvertUrls)
+                .HasDefaultValue(false)
+                .HasColumnName("convert_urls");
             entity.Property(e => e.DjRoles)
                 .IsRequired()
                 .HasDefaultValueSql("ARRAY[]::numeric[]")
@@ -97,7 +99,12 @@ public partial class InferiorBotContext : DbContext
                 .HasDefaultValueSql("100")
                 .HasColumnType("money")
                 .HasColumnName("balance");
-            entity.Property(e => e.Banned).HasColumnName("banned");
+            entity.Property(e => e.Banned)
+                .HasDefaultValue(false)
+                .HasColumnName("banned");
+            entity.Property(e => e.DailyCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("daily_cooldown");
         });
 
         OnModelCreatingPartial(modelBuilder);
