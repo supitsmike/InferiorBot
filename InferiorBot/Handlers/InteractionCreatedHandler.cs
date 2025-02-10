@@ -29,7 +29,7 @@ namespace InferiorBot.Handlers
             var services = notification.Services;
 
             var interactionContext = new SocketInteractionContext(client, interaction);
-            var user = await interactionContext.User.GetUserDataAsync(databaseContext, cancellationToken);
+            var user = await interactionContext.User.GetUserDataAsync(databaseContext, services, cancellationToken);
             if (user.Banned)
             {
                 await interactionContext.Interaction.RespondAsync("You have been banned from the bot.", ephemeral: true);

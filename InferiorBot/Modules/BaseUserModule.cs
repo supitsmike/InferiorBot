@@ -20,7 +20,7 @@ namespace InferiorBot.Modules
             AuthorIconUrl = Context.User.GetDisplayAvatarUrl() ?? Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
 
             GuildData = await Context.Guild.GetGuildDataAsync(context);
-            UserData = await Context.User.GetUserDataAsync(context);
+            UserData = await Context.User.GetUserDataAsync(context, services);
             ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == Context.Guild.Id && x.ChannelId == Context.Channel.Id).ToListAsync();
 
             await base.BeforeExecuteAsync(command);

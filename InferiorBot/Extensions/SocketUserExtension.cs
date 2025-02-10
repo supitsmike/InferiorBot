@@ -1,20 +1,23 @@
 ﻿using Discord.WebSocket;
 using Infrastructure.InferiorBot;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InferiorBot.Extensions
 {
     public static class SocketUserExtension
     {
-        public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, CancellationToken cancellationToken = default)
+        public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, IServiceProvider services, CancellationToken cancellationToken = default)
         {
+            var configuration = services.GetRequiredService<IConfiguration>();
             var userData = await context.Users.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
             if (userData == null)
             {
                 userData = new User
                 {
                     UserId = user.Id,
-                    Balance = 100,
+                    Balance = configuration.GetValue<decimal>("Settings:StartingBalance"),
                     Banned = false
                 };
                 await context.Users.AddAsync(userData, cancellationToken);
