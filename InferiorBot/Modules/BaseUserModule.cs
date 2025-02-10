@@ -2,20 +2,26 @@
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InferiorBot.Modules
 {
     public class BaseUserModule(InferiorBotContext context, IServiceProvider services) : InteractionModuleBase<SocketInteractionContext>
     {
-        protected Guild GuildData = null!;
-        protected User UserData = null!;
-        protected List<ConvertedUrl> ConvertedUrls = null!;
+        protected IConfiguration Configuration = null!;
 
         protected string? AuthorName;
         protected string? AuthorIconUrl;
 
+        protected Guild GuildData = null!;
+        protected User UserData = null!;
+        protected List<ConvertedUrl> ConvertedUrls = null!;
+
         public override async Task BeforeExecuteAsync(ICommandInfo command)
         {
+            Configuration = services.GetRequiredService<IConfiguration>();
+
             AuthorName = $"{Context.User.Username}{(Context.User.Discriminator != "0000" ? $"#{Context.User.Discriminator}" : string.Empty)}";
             AuthorIconUrl = Context.User.GetDisplayAvatarUrl() ?? Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
 

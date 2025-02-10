@@ -27,8 +27,7 @@ namespace InferiorBot.Modules
                 return;
             }
 
-            var configuration = _services.GetRequiredService<IConfiguration>();
-            var dailyBonus = configuration.GetValue<decimal>("Settings:DailyBonus");
+            var dailyBonus = Configuration.GetValue<decimal>("Settings:DailyBonus");
             UserData.Balance += dailyBonus;
             UserData.DailyCooldown = DateTime.Now.AddDays(1);
 
