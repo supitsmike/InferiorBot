@@ -11,7 +11,6 @@ namespace InferiorBot.Modules
     public class EconomyModule(InferiorBotContext context, IServiceProvider services) : BaseUserModule(context, services)
     {
         private readonly InferiorBotContext _context = context;
-        private readonly IServiceProvider _services = services;
 
         [SlashCommand("daily", "Claim your daily bonus.")]
         public async Task DailyBonus()
