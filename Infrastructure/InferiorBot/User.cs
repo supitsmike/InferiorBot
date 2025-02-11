@@ -13,6 +13,12 @@ public partial class User
 
     public bool Banned { get; set; }
 
+    public decimal Prestige { get; set; }
+
+    public decimal Level { get; set; }
+
+    public decimal Xp { get; set; }
+
     public DateTime? DailyCooldown { get; set; }
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();

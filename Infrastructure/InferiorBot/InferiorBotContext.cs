@@ -105,6 +105,16 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.DailyCooldown)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("daily_cooldown");
+            entity.Property(e => e.Level)
+                .HasPrecision(4)
+                .HasDefaultValueSql("1")
+                .HasColumnName("level");
+            entity.Property(e => e.Prestige)
+                .HasPrecision(2)
+                .HasColumnName("prestige");
+            entity.Property(e => e.Xp)
+                .HasPrecision(10)
+                .HasColumnName("xp");
         });
 
         OnModelCreatingPartial(modelBuilder);
