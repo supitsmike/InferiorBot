@@ -17,9 +17,11 @@ public partial class User
 
     public decimal Level { get; set; }
 
-    public decimal Xp { get; set; }
+    public int Xp { get; set; }
 
     public DateTime? DailyCooldown { get; set; }
+
+    public decimal DailyStreak { get; set; }
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 }

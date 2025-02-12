@@ -3,7 +3,6 @@ using Discord.Interactions;
 using InferiorBot.Classes;
 using Infrastructure.InferiorBot;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace InferiorBot.Modules
 {
@@ -29,22 +28,23 @@ namespace InferiorBot.Modules
             var dailyBonus = Configuration.GetValue<decimal>("Settings:DailyBonus");
             UserData.Balance += dailyBonus;
             UserData.DailyCooldown = DateTime.Now.AddDays(1);
+            UserData.DailyStreak++;
 
             if (!_context.ChangeTracker.HasChanges())
             {
-                await RespondAsync("Failed get update user.", ephemeral: true);
+                await RespondAsync("Failed to update user.", ephemeral: true);
                 return;
             }
             await _context.SaveChangesAsync();
 
             await RespondAsync(embed: new EmbedBuilder
             {
-                Title = "Daily bonus",
-                Description = $"You have collected your daily bonus of {Format.Bold($"${dailyBonus}")}.",
+                Title = "Daily Bonus",
+                Description = $"Daily bonus of {Format.Bold($"{dailyBonus:C}")} collected!{Environment.NewLine}{Environment.NewLine}{LevelingSystem.CanPrestige(UserData.Xp)} {LevelingSystem.GetLevelFromXp(UserData.Xp)}",
                 Color = Color.DarkGreen,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"New balance is {UserData.Balance:C}"
+                    Text = $"Streak: Day {UserData.DailyStreak}"
                 }
             }.Build(), ephemeral: true);
         }
