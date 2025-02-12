@@ -40,7 +40,7 @@ namespace InferiorBot.Modules
             await RespondAsync(embed: new EmbedBuilder
             {
                 Title = "Daily Bonus",
-                Description = $"Daily bonus of {Format.Bold($"{dailyBonus:C}")} collected!{Environment.NewLine}{Environment.NewLine}{LevelingSystem.CanPrestige(UserData.Xp)} {LevelingSystem.GetLevelFromXp(UserData.Xp)}",
+                Description = $"Daily bonus of {Format.Bold($"{dailyBonus:C}")} collected!",
                 Color = Color.DarkGreen,
                 Footer = new EmbedFooterBuilder
                 {
