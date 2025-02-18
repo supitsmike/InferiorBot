@@ -25,9 +25,10 @@ BEGIN
         	    OLD.all_time_won,
         	    NEW.all_time_won
         	);
+		END IF;
 		
 		-- all_time_lost
-		ELSIF NEW.all_time_lost IS DISTINCT FROM OLD.all_time_lost THEN
+		IF NEW.all_time_lost IS DISTINCT FROM OLD.all_time_lost THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -41,9 +42,10 @@ BEGIN
         	    OLD.all_time_lost,
         	    NEW.all_time_lost
         	);
+		END IF;
 		
 		-- biggest_win
-		ELSIF NEW.biggest_win IS DISTINCT FROM OLD.biggest_win THEN
+		IF NEW.biggest_win IS DISTINCT FROM OLD.biggest_win THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -57,9 +59,10 @@ BEGIN
         	    OLD.biggest_win,
         	    NEW.biggest_win
         	);
+		END IF;
 		
 		-- biggest_loss
-		ELSIF NEW.biggest_loss IS DISTINCT FROM OLD.biggest_loss THEN
+		IF NEW.biggest_loss IS DISTINCT FROM OLD.biggest_loss THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -73,9 +76,10 @@ BEGIN
         	    OLD.biggest_loss,
         	    NEW.biggest_loss
         	);
+		END IF;
 		
 		-- daily_count
-		ELSIF NEW.daily_count IS DISTINCT FROM OLD.daily_count THEN
+		IF NEW.daily_count IS DISTINCT FROM OLD.daily_count THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -89,9 +93,10 @@ BEGIN
         	    OLD.daily_count,
         	    NEW.daily_count
         	);
+		END IF;
 		
 		-- daily_streak
-		ELSIF NEW.daily_streak IS DISTINCT FROM OLD.daily_streak THEN
+		IF NEW.daily_streak IS DISTINCT FROM OLD.daily_streak THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -105,9 +110,10 @@ BEGIN
         	    OLD.daily_streak,
         	    NEW.daily_streak
         	);
+		END IF;
 		
 		-- work_count
-		ELSIF NEW.work_count IS DISTINCT FROM OLD.work_count THEN
+		IF NEW.work_count IS DISTINCT FROM OLD.work_count THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -121,9 +127,10 @@ BEGIN
         	    OLD.work_count,
         	    NEW.work_count
         	);
+		END IF;
 		
 		-- coin_flip_wins
-		ELSIF NEW.coin_flip_wins IS DISTINCT FROM OLD.coin_flip_wins THEN
+		IF NEW.coin_flip_wins IS DISTINCT FROM OLD.coin_flip_wins THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -137,9 +144,10 @@ BEGIN
         	    OLD.coin_flip_wins,
         	    NEW.coin_flip_wins
         	);
+		END IF;
 		
 		-- coin_flip_losses
-		ELSIF NEW.coin_flip_losses IS DISTINCT FROM OLD.coin_flip_losses THEN
+		IF NEW.coin_flip_losses IS DISTINCT FROM OLD.coin_flip_losses THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,

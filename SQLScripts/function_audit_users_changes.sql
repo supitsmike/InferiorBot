@@ -25,9 +25,10 @@ BEGIN
         	    OLD.balance,
         	    NEW.balance
         	);
+		END IF;
 		
 		-- level
-		ELSIF NEW.level IS DISTINCT FROM OLD.level THEN
+		IF NEW.level IS DISTINCT FROM OLD.level THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -41,9 +42,10 @@ BEGIN
         	    OLD.level,
         	    NEW.level
         	);
+		END IF;
 		
 		-- xp
-		ELSIF NEW.xp IS DISTINCT FROM OLD.xp THEN
+		IF NEW.xp IS DISTINCT FROM OLD.xp THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
@@ -57,9 +59,10 @@ BEGIN
         	    OLD.xp,
         	    NEW.xp
         	);
+		END IF;
 		
 		-- job_id
-		ELSIF NEW.job_id IS DISTINCT FROM OLD.job_id THEN
+		IF NEW.job_id IS DISTINCT FROM OLD.job_id THEN
         	INSERT INTO audit_log (
         	    user_id,
         	    table_name,
