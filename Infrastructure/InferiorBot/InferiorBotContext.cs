@@ -13,14 +13,57 @@ public partial class InferiorBotContext : DbContext
     {
     }
 
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+
     public virtual DbSet<ConvertedUrl> ConvertedUrls { get; set; }
 
     public virtual DbSet<Guild> Guilds { get; set; }
+
+    public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("uuid-ossp");
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.LogId).HasName("audit_log_pkey");
+
+            entity.ToTable("audit_log");
+
+            entity.Property(e => e.LogId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("log_id");
+            entity.Property(e => e.ColumnName)
+                .IsRequired()
+                .HasMaxLength(64)
+                .HasColumnName("column_name");
+            entity.Property(e => e.NewData)
+                .IsRequired()
+                .HasColumnName("new_data");
+            entity.Property(e => e.PreviousData)
+                .IsRequired()
+                .HasColumnName("previous_data");
+            entity.Property(e => e.TableName)
+                .IsRequired()
+                .HasMaxLength(64)
+                .HasColumnName("table_name");
+            entity.Property(e => e.Timestamp)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("timestamp");
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("audit_log_user_id_fkey");
+        });
+
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
             entity.HasKey(e => new { e.GuildId, e.ChannelId, e.MessageId }).HasName("converted_urls_pkey1");
@@ -41,7 +84,6 @@ public partial class InferiorBotContext : DbContext
                 .HasColumnName("date_posted");
             entity.Property(e => e.OriginalUrl)
                 .IsRequired()
-                .HasMaxLength(2048)
                 .HasColumnName("original_url");
             entity.Property(e => e.UserId)
                 .HasPrecision(19)
@@ -84,6 +126,29 @@ public partial class InferiorBotContext : DbContext
                 .HasColumnName("dj_roles");
         });
 
+        modelBuilder.Entity<Job>(entity =>
+        {
+            entity.HasKey(e => e.JobId).HasName("jobs_pkey");
+
+            entity.ToTable("jobs");
+
+            entity.Property(e => e.JobId)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("job_id");
+            entity.Property(e => e.Cooldown).HasColumnName("cooldown");
+            entity.Property(e => e.JobTitle)
+                .IsRequired()
+                .HasColumnName("job_title");
+            entity.Property(e => e.PayMax)
+                .HasColumnType("money")
+                .HasColumnName("pay_max");
+            entity.Property(e => e.PayMin)
+                .HasColumnType("money")
+                .HasColumnName("pay_min");
+            entity.Property(e => e.Probability).HasColumnName("probability");
+            entity.Property(e => e.RiskLevel).HasColumnName("risk_level");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("users_pkey");
@@ -105,16 +170,23 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.DailyCooldown)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("daily_cooldown");
+            entity.Property(e => e.DailyCount)
+                .HasPrecision(10)
+                .HasColumnName("daily_count");
             entity.Property(e => e.DailyStreak)
                 .HasPrecision(10)
                 .HasColumnName("daily_streak");
+            entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.Level)
                 .HasPrecision(4)
                 .HasDefaultValueSql("1")
                 .HasColumnName("level");
-            entity.Property(e => e.Prestige)
-                .HasPrecision(2)
-                .HasColumnName("prestige");
+            entity.Property(e => e.WorkCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("work_cooldown");
+            entity.Property(e => e.WorkCount)
+                .HasPrecision(10)
+                .HasColumnName("work_count");
             entity.Property(e => e.Xp)
                 .HasDefaultValue(0)
                 .HasColumnName("xp");

@@ -13,15 +13,23 @@ public partial class User
 
     public bool Banned { get; set; }
 
-    public decimal Prestige { get; set; }
-
     public decimal Level { get; set; }
 
     public int Xp { get; set; }
 
+    public int? JobId { get; set; }
+
     public DateTime? DailyCooldown { get; set; }
 
     public decimal DailyStreak { get; set; }
+
+    public decimal DailyCount { get; set; }
+
+    public DateTime? WorkCooldown { get; set; }
+
+    public decimal WorkCount { get; set; }
+
+    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 }
