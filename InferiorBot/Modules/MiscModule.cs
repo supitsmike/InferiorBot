@@ -70,7 +70,7 @@ namespace InferiorBot.Modules
                 "Not now", "Very likely", "Not likely"
             ];
 
-            var answer = answers[Methods.GenerateRandomNumber(answers.Length)];
+            var answer = answers[NumericRandomizer.GenerateRandomNumber(answers.Length)];
             await RespondAsync(embed: new EmbedBuilder
             {
                 Author = new EmbedAuthorBuilder
