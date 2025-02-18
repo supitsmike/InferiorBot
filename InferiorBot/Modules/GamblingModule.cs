@@ -1,8 +1,7 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using InferiorBot.Classes;
 using Infrastructure.InferiorBot;
-using System.Threading;
-using Discord;
 
 namespace InferiorBot.Modules
 {
@@ -16,7 +15,7 @@ namespace InferiorBot.Modules
             [ChoiceDisplay("heads")] Heads,
             [ChoiceDisplay("tails")] Tails
         }
-        [SlashCommand("coinflip", "Claim your daily bonus.")]
+        [SlashCommand("coinflip", "Flip a coin for a chance to double your money.")]
         public async Task CoinFlip([Summary(description: "heads or tails?")] CoinFlipEnum selection, [Summary(description: "How much money would you like to bet? (all is also valid)")] string? amount = null)
         {
             var sides = new[] { CoinFlipEnum.Heads.ToString(), CoinFlipEnum.Tails.ToString() };
