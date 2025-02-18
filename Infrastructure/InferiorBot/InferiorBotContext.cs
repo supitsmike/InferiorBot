@@ -13,8 +13,6 @@ public partial class InferiorBotContext : DbContext
     {
     }
 
-    public virtual DbSet<AuditLog> AuditLogs { get; set; }
-
     public virtual DbSet<ConvertedUrl> ConvertedUrls { get; set; }
 
     public virtual DbSet<Guild> Guilds { get; set; }
@@ -28,43 +26,6 @@ public partial class InferiorBotContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("uuid-ossp");
-
-        modelBuilder.Entity<AuditLog>(entity =>
-        {
-            entity.HasKey(e => e.LogId).HasName("audit_log_pkey");
-
-            entity.ToTable("audit_log");
-
-            entity.Property(e => e.LogId)
-                .HasDefaultValueSql("uuid_generate_v4()")
-                .HasColumnName("log_id");
-            entity.Property(e => e.ColumnName)
-                .IsRequired()
-                .HasMaxLength(64)
-                .HasColumnName("column_name");
-            entity.Property(e => e.NewData)
-                .IsRequired()
-                .HasColumnName("new_data");
-            entity.Property(e => e.PreviousData)
-                .IsRequired()
-                .HasColumnName("previous_data");
-            entity.Property(e => e.TableName)
-                .IsRequired()
-                .HasMaxLength(64)
-                .HasColumnName("table_name");
-            entity.Property(e => e.Timestamp)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("timestamp");
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("audit_log_user_id_fkey");
-        });
 
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
