@@ -30,10 +30,10 @@ namespace InferiorBot.Modules
                 return;
             }
 
-            UserData.DailyCount++;
-            UserData.DailyStreak =
+            UserData.UserStat.DailyCount++;
+            UserData.UserStat.DailyStreak =
                 UserData.DailyCooldown.HasValue && UserData.DailyCooldown.Value.Date == DateTime.Now.Date
-                    ? UserData.DailyStreak + 1
+                    ? UserData.UserStat.DailyStreak + 1
                     : 1;
             UserData.DailyCooldown = DateTime.Now.AddDays(1);
 
@@ -54,7 +54,7 @@ namespace InferiorBot.Modules
                 Color = Color.DarkGreen,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Streak: Day {UserData.DailyStreak}"
+                    Text = $"Streak: Day {UserData.UserStat.DailyStreak}"
                 }
             }.Build(), ephemeral: true);
         }
@@ -126,7 +126,7 @@ namespace InferiorBot.Modules
             UserData.Balance += amount;
 
             UserData.WorkCooldown = DateTime.Now.AddMinutes(selectedJob.Cooldown);
-            UserData.WorkCount++;
+            UserData.UserStat.WorkCount++;
 
             if (!_context.ChangeTracker.HasChanges())
             {
@@ -146,7 +146,7 @@ namespace InferiorBot.Modules
                 Color = Color.DarkGreen,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"New balance is {UserData.Balance:C}"
+                    Text = $"New balance is {UserData.Balance:$#,##0.00;-$#,##0.00}"
                 }
             }.Build(), ephemeral: true);
         }

@@ -23,6 +23,8 @@ public partial class InferiorBotContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserStat> UserStats { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("uuid-ossp");
@@ -170,12 +172,6 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.DailyCooldown)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("daily_cooldown");
-            entity.Property(e => e.DailyCount)
-                .HasPrecision(10)
-                .HasColumnName("daily_count");
-            entity.Property(e => e.DailyStreak)
-                .HasPrecision(10)
-                .HasColumnName("daily_streak");
             entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.Level)
                 .HasPrecision(4)
@@ -184,12 +180,52 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.WorkCooldown)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("work_cooldown");
-            entity.Property(e => e.WorkCount)
-                .HasPrecision(10)
-                .HasColumnName("work_count");
             entity.Property(e => e.Xp)
                 .HasDefaultValue(0)
                 .HasColumnName("xp");
+        });
+
+        modelBuilder.Entity<UserStat>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("user_stats_pkey");
+
+            entity.ToTable("user_stats");
+
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.AllTimeLost)
+                .HasColumnType("money")
+                .HasColumnName("all_time_lost");
+            entity.Property(e => e.AllTimeWon)
+                .HasColumnType("money")
+                .HasColumnName("all_time_won");
+            entity.Property(e => e.BiggestLoss)
+                .HasColumnType("money")
+                .HasColumnName("biggest_loss");
+            entity.Property(e => e.BiggestWin)
+                .HasColumnType("money")
+                .HasColumnName("biggest_win");
+            entity.Property(e => e.CoinFlipLosses)
+                .HasPrecision(10)
+                .HasColumnName("coin_flip_losses");
+            entity.Property(e => e.CoinFlipWins)
+                .HasPrecision(10)
+                .HasColumnName("coin_flip_wins");
+            entity.Property(e => e.DailyCount)
+                .HasPrecision(10)
+                .HasColumnName("daily_count");
+            entity.Property(e => e.DailyStreak)
+                .HasPrecision(10)
+                .HasColumnName("daily_streak");
+            entity.Property(e => e.WorkCount)
+                .HasPrecision(10)
+                .HasColumnName("work_count");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserStat)
+                .HasForeignKey<UserStat>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("user_stats_user_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

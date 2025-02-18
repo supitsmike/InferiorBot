@@ -11,7 +11,8 @@ namespace InferiorBot.Extensions
         public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, IServiceProvider services, CancellationToken cancellationToken = default)
         {
             var configuration = services.GetRequiredService<IConfiguration>();
-            var userData = await context.Users.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
+            var userData = await context.Users.Include(x => x.UserStat)
+                .FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
             if (userData == null)
             {
                 userData = new User
@@ -24,6 +25,10 @@ namespace InferiorBot.Extensions
                 if (!context.ChangeTracker.HasChanges()) throw new ApplicationException("Failed to add user to database.");
             }
             if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync(cancellationToken);
+
+            userData.UserStat ??=
+                await context.UserStats.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken) ??
+                new UserStat();
 
             await context.Entry(userData).ReloadAsync(cancellationToken);
             return userData;

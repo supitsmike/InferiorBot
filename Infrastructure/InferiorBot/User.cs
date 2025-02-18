@@ -21,15 +21,11 @@ public partial class User
 
     public DateTime? DailyCooldown { get; set; }
 
-    public decimal DailyStreak { get; set; }
-
-    public decimal DailyCount { get; set; }
-
     public DateTime? WorkCooldown { get; set; }
-
-    public decimal WorkCount { get; set; }
 
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual UserStat UserStat { get; set; }
 }
