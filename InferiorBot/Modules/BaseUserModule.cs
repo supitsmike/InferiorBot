@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Discord.WebSocket;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace InferiorBot.Modules
     public class BaseUserModule(InferiorBotContext context, IServiceProvider services) : InteractionModuleBase<SocketInteractionContext>
     {
         protected IConfiguration Configuration = null!;
+        protected IReadOnlyCollection<SocketApplicationCommand> Commands = null!;
 
         protected string? AuthorName;
         protected string? AuthorIconUrl;
@@ -21,6 +23,7 @@ namespace InferiorBot.Modules
         public override async Task BeforeExecuteAsync(ICommandInfo command)
         {
             Configuration = services.GetRequiredService<IConfiguration>();
+            Commands = await Context.Client.GetGlobalApplicationCommandsAsync();
 
             AuthorName = $"{Context.User.Username}{(Context.User.Discriminator != "0000" ? $"#{Context.User.Discriminator}" : string.Empty)}";
             AuthorIconUrl = Context.User.GetDisplayAvatarUrl() ?? Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
