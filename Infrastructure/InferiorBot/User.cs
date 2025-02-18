@@ -23,6 +23,8 @@ public partial class User
 
     public DateTime? WorkCooldown { get; set; }
 
+    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 
     public virtual UserStat UserStat { get; set; }

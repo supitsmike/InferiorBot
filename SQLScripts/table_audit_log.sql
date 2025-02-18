@@ -20,12 +20,3 @@ CREATE TABLE IF NOT EXISTS public.audit_log
 
 ALTER TABLE IF EXISTS public.audit_log
     OWNER to inferior_user;
-
--- Partitions SQL
-
-CREATE TABLE public.audit_log_740681497224282152 PARTITION OF public.audit_log
-    FOR VALUES IN ('740681497224282152')
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.audit_log_740681497224282152
-    OWNER to inferior_user;

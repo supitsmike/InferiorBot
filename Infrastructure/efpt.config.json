@@ -15,6 +15,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "public.audit_log",
+         "ObjectType": 0
+      },
+      {
          "Name": "public.converted_urls",
          "ObjectType": 0
       },
