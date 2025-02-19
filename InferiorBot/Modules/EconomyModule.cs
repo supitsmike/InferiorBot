@@ -16,14 +16,14 @@ namespace InferiorBot.Modules
         [SlashCommand("daily", "Claim your daily bonus.")]
         public async Task DailyBonus()
         {
-            if (UserData.DailyCooldown.HasValue && UserData.DailyCooldown > DateTime.Now)
+            if (UserData.UserCooldown.DailyCooldown.HasValue && UserData.UserCooldown.DailyCooldown > DateTime.Now)
             {
                 await RespondAsync(embed: new EmbedBuilder
                 {
                     Title = "Daily bonus not ready",
                     Description = $"""
                                    :hourglass_flowing_sand: You have already collected your daily bonus.
-                                   Try again {Format.Bold(DiscordFormatter.Timestamp(UserData.DailyCooldown.Value))}
+                                   Try again {Format.Bold(DiscordFormatter.Timestamp(UserData.UserCooldown.DailyCooldown.Value))}
                                    """,
                     Color = Color.DarkRed
                 }.Build(), ephemeral: true);
@@ -32,10 +32,10 @@ namespace InferiorBot.Modules
 
             UserData.UserStat.DailyCount++;
             UserData.UserStat.DailyStreak =
-                UserData.DailyCooldown.HasValue && UserData.DailyCooldown.Value.Date == DateTime.Now.Date
+                UserData.UserCooldown.DailyCooldown.HasValue && UserData.UserCooldown.DailyCooldown.Value.Date == DateTime.Now.Date
                     ? UserData.UserStat.DailyStreak + 1
                     : 1;
-            UserData.DailyCooldown = DateTime.Now.AddDays(1);
+            UserData.UserCooldown.DailyCooldown = DateTime.Now.AddDays(1);
 
             var dailyBonus = Configuration.GetValue<decimal>("Settings:DailyBonus");
             UserData.Balance += dailyBonus;
@@ -110,13 +110,13 @@ namespace InferiorBot.Modules
                 return;
             }
 
-            if (UserData.WorkCooldown.HasValue && UserData.WorkCooldown.Value > DateTime.Now)
+            if (UserData.UserCooldown.WorkCooldown.HasValue && UserData.UserCooldown.WorkCooldown.Value > DateTime.Now)
             {
                 await RespondAsync(embed: new EmbedBuilder
                 {
                     Title = "Cannot work again yet",
                     Description =
-                        $":hourglass_flowing_sand: You can work again {Format.Bold(DiscordFormatter.Timestamp(UserData.WorkCooldown.Value))}",
+                        $":hourglass_flowing_sand: You can work again {Format.Bold(DiscordFormatter.Timestamp(UserData.UserCooldown.WorkCooldown.Value))}",
                     Color = Color.DarkRed
                 }.Build(), ephemeral: true);
                 return;
@@ -125,7 +125,7 @@ namespace InferiorBot.Modules
             var (amount, success) = selectedJob.GetPayAmount();
             UserData.Balance += amount;
 
-            UserData.WorkCooldown = DateTime.Now.AddMinutes(selectedJob.Cooldown);
+            UserData.UserCooldown.WorkCooldown = DateTime.Now.AddMinutes(selectedJob.Cooldown);
             UserData.UserStat.WorkCount++;
 
             if (!_context.ChangeTracker.HasChanges())

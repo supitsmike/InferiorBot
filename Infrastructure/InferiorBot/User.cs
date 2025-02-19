@@ -19,13 +19,11 @@ public partial class User
 
     public int? JobId { get; set; }
 
-    public DateTime? DailyCooldown { get; set; }
-
-    public DateTime? WorkCooldown { get; set; }
-
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual UserCooldown UserCooldown { get; set; }
 
     public virtual UserStat UserStat { get; set; }
 }

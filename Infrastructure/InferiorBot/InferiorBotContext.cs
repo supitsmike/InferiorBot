@@ -23,6 +23,8 @@ public partial class InferiorBotContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserCooldown> UserCooldowns { get; set; }
+
     public virtual DbSet<UserStat> UserStats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -166,20 +168,36 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.Banned)
                 .HasDefaultValue(false)
                 .HasColumnName("banned");
-            entity.Property(e => e.DailyCooldown)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("daily_cooldown");
             entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.Level)
                 .HasPrecision(4)
                 .HasDefaultValueSql("1")
                 .HasColumnName("level");
-            entity.Property(e => e.WorkCooldown)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("work_cooldown");
             entity.Property(e => e.Xp)
                 .HasDefaultValue(0)
                 .HasColumnName("xp");
+        });
+
+        modelBuilder.Entity<UserCooldown>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("user_cooldowns_pkey");
+
+            entity.ToTable("user_cooldowns");
+
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.DailyCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("daily_cooldown");
+            entity.Property(e => e.WorkCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("work_cooldown");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserCooldown)
+                .HasForeignKey<UserCooldown>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("user_cooldowns_user_id_fkey");
         });
 
         modelBuilder.Entity<UserStat>(entity =>

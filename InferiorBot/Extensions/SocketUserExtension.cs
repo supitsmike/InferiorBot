@@ -11,7 +11,7 @@ namespace InferiorBot.Extensions
         public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, IServiceProvider services, CancellationToken cancellationToken = default)
         {
             var configuration = services.GetRequiredService<IConfiguration>();
-            var userData = await context.Users.Include(x => x.UserStat)
+            var userData = await context.Users.Include(x => x.UserStat).Include(x => x.UserCooldown)
                 .FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
             if (userData == null)
             {
@@ -29,6 +29,10 @@ namespace InferiorBot.Extensions
             userData.UserStat ??=
                 await context.UserStats.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken) ??
                 new UserStat();
+
+            userData.UserCooldown ??=
+                await context.UserCooldowns.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken) ??
+                new UserCooldown();
 
             await context.Entry(userData).ReloadAsync(cancellationToken);
             return userData;
