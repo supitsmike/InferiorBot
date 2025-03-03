@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.InferiorBot;
+﻿using Infrastructure.InferiorBot;
 
 namespace InferiorBot.Extensions
 {
     public static class UserExtension
     {
-        public static void WriteAuditLog(this InferiorBotContext context, decimal userId, string tableName, string columnName)
+        public static void WonMoney(this User user, decimal amount, bool addToBalance = true)
         {
-            context.AuditLogs.AddAsync(new AuditLog
-            {
-                LogId = Guid.NewGuid(),
-                UserId = userId,
-                TableName = "",
-                ColumnName = "",
-                NewData = "",
-                PreviousData = ""
-            });
+            if (addToBalance) user.Balance += amount;
+
+            user.UserStat.AllTimeWon += amount;
+            user.UserStat.BiggestWin = user.UserStat.BiggestWin > amount ? user.UserStat.BiggestWin : amount;
+        }
+
+        public static void LostMoney(this User user, decimal amount, bool removeFromBalance = true)
+        {
+            if (removeFromBalance) user.Balance -= amount;
+
+            user.UserStat.AllTimeLost += amount;
+            user.UserStat.BiggestLoss = user.UserStat.BiggestLoss > amount ? user.UserStat.BiggestLoss : amount;
         }
     }
 }
