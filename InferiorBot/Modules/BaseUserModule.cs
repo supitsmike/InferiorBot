@@ -18,6 +18,7 @@ namespace InferiorBot.Modules
 
         protected Guild GuildData = null!;
         protected User UserData = null!;
+        protected List<Game> ActiveGames = null!;
         protected List<ConvertedUrl> ConvertedUrls = null!;
 
         public override async Task BeforeExecuteAsync(ICommandInfo command)
@@ -30,6 +31,7 @@ namespace InferiorBot.Modules
 
             GuildData = await Context.Guild.GetGuildDataAsync(context);
             UserData = await Context.User.GetUserDataAsync(context, services);
+            ActiveGames = await context.Games.Include(x => x.GameUsers).Where(x => x.GuildId == Context.Guild.Id).ToListAsync();
             ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == Context.Guild.Id && x.ChannelId == Context.Channel.Id).ToListAsync();
 
             await base.BeforeExecuteAsync(command);

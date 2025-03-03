@@ -26,7 +26,7 @@ namespace InferiorBot
             await client.StartAsync();
 
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.SetActivityAsync(new Game("you sleep", ActivityType.Watching));
+            await client.SetActivityAsync(new Discord.Game("you sleep", ActivityType.Watching));
         }
 
         private Task OnLogAsync(LogMessage message)
