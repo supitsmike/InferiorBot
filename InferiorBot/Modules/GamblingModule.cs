@@ -57,17 +57,13 @@ namespace InferiorBot.Modules
 
                 if (result)
                 {
-                    UserData.Balance += betAmount;
+                    UserData.WonMoney(betAmount);
                     UserData.UserStat.CoinFlipWins++;
-                    UserData.UserStat.AllTimeWon += betAmount;
-                    UserData.UserStat.BiggestWin = UserData.UserStat.BiggestWin > betAmount ? UserData.UserStat.BiggestWin : betAmount;
                 }
                 else
                 {
-                    UserData.Balance -= betAmount;
+                    UserData.LostMoney(betAmount);
                     UserData.UserStat.CoinFlipLosses++;
-                    UserData.UserStat.AllTimeLost += betAmount;
-                    UserData.UserStat.BiggestLoss = UserData.UserStat.BiggestLoss > betAmount ? UserData.UserStat.BiggestLoss : betAmount;
                 }
 
                 if (!_context.ChangeTracker.HasChanges())
