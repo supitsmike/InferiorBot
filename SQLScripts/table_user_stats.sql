@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS public.user_stats
     work_count numeric(10,0) NOT NULL DEFAULT 0,
     coin_flip_wins numeric(10,0) NOT NULL DEFAULT 0,
     coin_flip_losses numeric(10,0) NOT NULL DEFAULT 0,
+    guess_wins numeric(10,0) NOT NULL DEFAULT 0,
+    guess_losses numeric(10,0) NOT NULL DEFAULT 0,
     CONSTRAINT user_stats_pkey PRIMARY KEY (user_id),
     CONSTRAINT user_stats_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES public.users (user_id) MATCH SIMPLE
@@ -25,3 +27,13 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.user_stats
     OWNER to inferior_user;
+
+-- Trigger: audit_user_stats_changes
+
+-- DROP TRIGGER IF EXISTS audit_user_stats_changes ON public.user_stats;
+
+CREATE OR REPLACE TRIGGER audit_user_stats_changes
+    BEFORE UPDATE 
+    ON public.user_stats
+    FOR EACH ROW
+    EXECUTE FUNCTION public.audit_user_stats_changes();

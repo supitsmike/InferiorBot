@@ -5,14 +5,15 @@ using System.Collections.Generic;
 
 namespace Infrastructure.InferiorBot;
 
-public partial class AuditLog
+public partial class GameUser
 {
-    public Guid LogId { get; set; }
+    public Guid GameId { get; set; }
+
     public decimal UserId { get; set; }
-    public string TableName { get; set; }
-    public string ColumnName { get; set; }
-    public string PreviousData { get; set; }
-    public string NewData { get; set; }
-    public DateTime Timestamp { get; set; }
+
+    public string UserData { get; set; }
+
+    public virtual Game Game { get; set; }
+
     public virtual User User { get; set; }
 }

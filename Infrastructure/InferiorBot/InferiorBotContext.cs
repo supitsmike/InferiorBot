@@ -13,9 +13,13 @@ public partial class InferiorBotContext : DbContext
     {
     }
 
-    public virtual DbSet<AuditLog> AuditLogs { get; set; }
-
     public virtual DbSet<ConvertedUrl> ConvertedUrls { get; set; }
+
+    public virtual DbSet<Game> Games { get; set; }
+
+    public virtual DbSet<GameType> GameTypes { get; set; }
+
+    public virtual DbSet<GameUser> GameUsers { get; set; }
 
     public virtual DbSet<Guild> Guilds { get; set; }
 
@@ -30,40 +34,6 @@ public partial class InferiorBotContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("uuid-ossp");
-
-        modelBuilder.Entity<AuditLog>(entity =>
-        {
-            entity.HasKey(e => e.LogId).HasName("audit_log_pkey");
-            entity.ToTable("audit_log");
-            entity.Property(e => e.LogId)
-                .HasDefaultValueSql("uuid_generate_v4()")
-                .HasColumnName("log_id");
-            entity.Property(e => e.ColumnName)
-                .IsRequired()
-                .HasMaxLength(64)
-                .HasColumnName("column_name");
-            entity.Property(e => e.NewData)
-                .IsRequired()
-                .HasColumnName("new_data");
-            entity.Property(e => e.PreviousData)
-                .IsRequired()
-                .HasColumnName("previous_data");
-            entity.Property(e => e.TableName)
-                .IsRequired()
-                .HasMaxLength(64)
-                .HasColumnName("table_name");
-            entity.Property(e => e.Timestamp)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("timestamp");
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
-            entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("audit_log_user_id_fkey");
-        });
 
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
@@ -99,6 +69,84 @@ public partial class InferiorBotContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("converted_urls_user_id_fkey1");
+        });
+
+        modelBuilder.Entity<Game>(entity =>
+        {
+            entity.HasKey(e => e.GameId).HasName("games_pkey");
+
+            entity.ToTable("games");
+
+            entity.HasIndex(e => e.GameId, "games_game_id_key").IsUnique();
+
+            entity.Property(e => e.GameId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("game_id");
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_date");
+            entity.Property(e => e.GameData)
+                .IsRequired()
+                .HasColumnType("json")
+                .HasColumnName("game_data");
+            entity.Property(e => e.GameTypeId).HasColumnName("game_type_id");
+            entity.Property(e => e.GuildId)
+                .HasPrecision(19)
+                .HasColumnName("guild_id");
+
+            entity.HasOne(d => d.GameType).WithMany(p => p.Games)
+                .HasForeignKey(d => d.GameTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("games_game_type_id_fkey");
+
+            entity.HasOne(d => d.Guild).WithMany(p => p.Games)
+                .HasForeignKey(d => d.GuildId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("games_guild_id_fkey");
+        });
+
+        modelBuilder.Entity<GameType>(entity =>
+        {
+            entity.HasKey(e => e.GameTypeId).HasName("game_types_pkey");
+
+            entity.ToTable("game_types");
+
+            entity.HasIndex(e => e.Name, "game_types_name_key").IsUnique();
+
+            entity.Property(e => e.GameTypeId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("game_type_id");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<GameUser>(entity =>
+        {
+            entity.HasKey(e => new { e.GameId, e.UserId }).HasName("game_users_pkey");
+
+            entity.ToTable("game_users");
+
+            entity.HasIndex(e => new { e.GameId, e.UserId }, "game_users_game_id_user_id_key").IsUnique();
+
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.UserData)
+                .HasColumnType("json")
+                .HasColumnName("user_data");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameUsers)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("game_users_game_id_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.GameUsers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("game_users_user_id_fkey");
         });
 
         modelBuilder.Entity<Guild>(entity =>
@@ -233,6 +281,12 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.DailyStreak)
                 .HasPrecision(10)
                 .HasColumnName("daily_streak");
+            entity.Property(e => e.GuessLosses)
+                .HasPrecision(10)
+                .HasColumnName("guess_losses");
+            entity.Property(e => e.GuessWins)
+                .HasPrecision(10)
+                .HasColumnName("guess_wins");
             entity.Property(e => e.WorkCount)
                 .HasPrecision(10)
                 .HasColumnName("work_count");

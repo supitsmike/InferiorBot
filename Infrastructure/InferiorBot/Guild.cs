@@ -16,4 +16,6 @@ public partial class Guild
     public bool ConvertUrls { get; set; }
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
 }

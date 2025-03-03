@@ -10,8 +10,6 @@ CREATE TABLE IF NOT EXISTS public.users
     level numeric(4,0) NOT NULL DEFAULT 1,
     xp integer NOT NULL DEFAULT 0,
     job_id integer,
-    daily_cooldown timestamp without time zone,
-    work_cooldown timestamp without time zone,
     CONSTRAINT users_pkey PRIMARY KEY (user_id),
     CONSTRAINT users_user_id_key UNIQUE (user_id)
 )
@@ -30,3 +28,13 @@ CREATE OR REPLACE TRIGGER audit_users_changes
     ON public.users
     FOR EACH ROW
     EXECUTE FUNCTION public.audit_users_changes();
+
+-- Trigger: create_audit_log_partition
+
+-- DROP TRIGGER IF EXISTS create_audit_log_partition ON public.users;
+
+CREATE OR REPLACE TRIGGER create_audit_log_partition
+    BEFORE INSERT
+    ON public.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.create_audit_log_partition();

@@ -13,36 +13,44 @@
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
    "T4TemplatePath": null,
-  "Tables": [
-    {
-      "Name": "public.audit_log",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.converted_urls",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.guilds",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.jobs",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.user_cooldowns",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.user_stats",
-      "ObjectType": 0
-    },
-    {
-      "Name": "public.users",
-      "ObjectType": 0
-    }
-  ],
+   "Tables": [
+      {
+         "Name": "public.converted_urls",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.game_types",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.game_users",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.games",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.guilds",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.jobs",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.user_cooldowns",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.user_stats",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.users",
+         "ObjectType": 0
+      }
+   ],
    "UiHint": null,
    "UncountableWords": null,
    "UseAsyncStoredProcedureCalls": true,

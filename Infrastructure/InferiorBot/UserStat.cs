@@ -27,5 +27,9 @@ public partial class UserStat
 
     public decimal CoinFlipLosses { get; set; }
 
+    public decimal GuessWins { get; set; }
+
+    public decimal GuessLosses { get; set; }
+
     public virtual User User { get; set; }
 }

@@ -19,9 +19,9 @@ public partial class User
 
     public int? JobId { get; set; }
 
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
-
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
     public virtual UserCooldown UserCooldown { get; set; }
 
