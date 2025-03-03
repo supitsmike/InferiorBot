@@ -17,6 +17,8 @@ namespace InferiorBot.Handlers
             var services = notification.Services;
 
             await handler.AddModulesAsync(typeof(DiscordBot).Assembly, services);
+
+            await handler.RegisterCommandsGloballyAsync();
         }
     }
 }

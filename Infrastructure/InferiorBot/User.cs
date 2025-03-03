@@ -13,5 +13,17 @@ public partial class User
 
     public bool Banned { get; set; }
 
+    public decimal Level { get; set; }
+
+    public int Xp { get; set; }
+
+    public int? JobId { get; set; }
+
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
+
+    public virtual UserCooldown UserCooldown { get; set; }
+
+    public virtual UserStat UserStat { get; set; }
 }

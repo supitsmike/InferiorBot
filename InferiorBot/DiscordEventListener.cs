@@ -17,6 +17,7 @@ namespace InferiorBot
         {
             client.Log += OnLogAsync;
             client.Ready += OnReadyAsync;
+            client.MessageDeleted += OnMessageDeletedAsync;
             client.MessageReceived += OnMessageReceivedAsync;
             client.InteractionCreated += OnInteractionCreatedAsync;
 
@@ -25,7 +26,7 @@ namespace InferiorBot
             await client.StartAsync();
 
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.SetActivityAsync(new Game("you sleep", ActivityType.Watching));
+            await client.SetActivityAsync(new Discord.Game("you sleep", ActivityType.Watching));
         }
 
         private Task OnLogAsync(LogMessage message)
@@ -38,9 +39,14 @@ namespace InferiorBot
             return mediator.Publish(new ReadyNotification(handler, services), _cancellationToken);
         }
 
+        private Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> message, Cacheable<IMessageChannel, ulong> messageChannel)
+        {
+            return mediator.Publish(new MessageDeletedNotification(message, messageChannel, context), _cancellationToken);
+        }
+
         private Task OnMessageReceivedAsync(SocketMessage message)
         {
-            return mediator.Publish(new MessageReceivedNotification(message, context), _cancellationToken);
+            return mediator.Publish(new MessageReceivedNotification(message, context, services), _cancellationToken);
         }
 
         private Task OnInteractionCreatedAsync(SocketInteraction interaction)

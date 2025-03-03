@@ -29,14 +29,35 @@ namespace InferiorBot.Handlers
             var services = notification.Services;
 
             var interactionContext = new SocketInteractionContext(client, interaction);
+            var user = await interactionContext.User.GetUserDataAsync(databaseContext, services, cancellationToken);
+            if (user.Banned)
+            {
+                await interactionContext.Interaction.RespondAsync("You have been banned from the bot.", ephemeral: true);
+                return;
+            }
+
             if (interactionContext.Interaction is ISlashCommandInteraction)
             {
-                var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext);
-                var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => guildData.BotChannels != null && guildData.BotChannels.Contains(channel.Id));
-                if (channel != null && channel.Id != interactionContext.Channel.Id)
+                var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext, cancellationToken);
+                var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => channel.Id == interactionContext.Channel.Id && guildData.BotChannels.Contains(channel.Id));
+                if (channel == null)
                 {
-                    await interaction.RespondAsync($"You can only use bot commands in {DiscordFormatter.Mention(channel)}.", ephemeral: true);
-                    return;
+                    var botChannels = interactionContext.Guild.Channels.Where(x => guildData.BotChannels.Contains(x.Id)).ToList();
+                    if (botChannels.Count > 0)
+                    {
+                        var channelMentions = string.Empty;
+                        for (var i = 0; i < botChannels.Count; i++)
+                        {
+                            var botChannel = botChannels[i];
+                            channelMentions += DiscordFormatter.Mention(botChannel);
+
+                            if (i + 1 == botChannels.Count - 1) channelMentions += ", or ";
+                            else if (i + 1 != botChannels.Count) channelMentions += ", ";
+                        }
+
+                        await interactionContext.Interaction.RespondAsync($"You can only use bot commands in {channelMentions}.", ephemeral: true);
+                        return;
+                    }
                 }
             }
 
@@ -59,7 +80,7 @@ namespace InferiorBot.Handlers
                     break;
             }
 
-            await interaction.RespondAsync("Something went wrong.", ephemeral: true).ConfigureAwait(false);
+            await interaction.RespondAsync("Something went wrong.", ephemeral: true);
         }
     }
 }
