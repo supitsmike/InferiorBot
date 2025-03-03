@@ -26,7 +26,7 @@ namespace InferiorBot
             await client.StartAsync();
 
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.SetActivityAsync(new Game("you sleep", ActivityType.Watching));
+            await client.SetActivityAsync(new Discord.Game("you sleep", ActivityType.Watching));
         }
 
         private Task OnLogAsync(LogMessage message)
@@ -46,7 +46,7 @@ namespace InferiorBot
 
         private Task OnMessageReceivedAsync(SocketMessage message)
         {
-            return mediator.Publish(new MessageReceivedNotification(message, context), _cancellationToken);
+            return mediator.Publish(new MessageReceivedNotification(message, context, services), _cancellationToken);
         }
 
         private Task OnInteractionCreatedAsync(SocketInteraction interaction)

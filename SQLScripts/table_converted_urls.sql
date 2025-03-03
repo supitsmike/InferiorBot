@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.converted_urls
     channel_id numeric(19,0) NOT NULL,
     message_id numeric(19,0) NOT NULL,
     user_id numeric(19,0) NOT NULL,
-    original_url character varying(2048) COLLATE pg_catalog."default" NOT NULL,
+    original_url text COLLATE pg_catalog."default" NOT NULL,
     date_posted timestamp without time zone NOT NULL,
     CONSTRAINT converted_urls_pkey1 PRIMARY KEY (guild_id, channel_id, message_id),
     CONSTRAINT converted_urls_guild_id_fkey FOREIGN KEY (guild_id)

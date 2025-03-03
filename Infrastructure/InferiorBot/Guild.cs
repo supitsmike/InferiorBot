@@ -9,11 +9,13 @@ public partial class Guild
 {
     public decimal GuildId { get; set; }
 
-    public decimal[] BotChannels { get; set; }
+    public List<decimal> BotChannels { get; set; }
 
-    public decimal[] DjRoles { get; set; }
+    public List<decimal> DjRoles { get; set; }
 
     public bool ConvertUrls { get; set; }
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
+
+    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
 }

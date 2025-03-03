@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Handlers
 {
-    public class MessageReceivedNotification(SocketMessage message, InferiorBotContext context) : INotification
+    public class MessageReceivedNotification(SocketMessage message, InferiorBotContext context, IServiceProvider services) : INotification
     {
         public SocketMessage Message { get; } = message ?? throw new ArgumentNullException(nameof(message));
         public InferiorBotContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
+        public IServiceProvider Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
     }
 
     public class MessageReceivedHandler : INotificationHandler<MessageReceivedNotification>
@@ -23,7 +24,8 @@ namespace InferiorBot.Handlers
             if (message.Content.IsValidUrl() == false) return;
 
             var context = notification.Context;
-            var user = await message.Author.GetUserDataAsync(context, cancellationToken);
+            var services = notification.Services;
+            var user = await message.Author.GetUserDataAsync(context, services, cancellationToken);
             if (user.Banned) return;
 
             var channel = message.Channel as SocketGuildChannel;

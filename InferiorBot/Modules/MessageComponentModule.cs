@@ -6,7 +6,7 @@ using Infrastructure.InferiorBot;
 
 namespace InferiorBot.Modules
 {
-    public class MessageComponentModule(InferiorBotContext context) : BaseUserModule(context)
+    public class MessageComponentModule(InferiorBotContext context, IServiceProvider services) : BaseUserModule(context, services)
     {
         private readonly InferiorBotContext _context = context;
 

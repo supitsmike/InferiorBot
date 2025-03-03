@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 3,
+   "CodeGenerationMode": 4,
    "ContextClassName": "InferiorBotContext",
    "ContextNamespace": null,
    "FilterSchemas": false,
@@ -19,7 +19,31 @@
          "ObjectType": 0
       },
       {
+         "Name": "public.game_types",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.game_users",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.games",
+         "ObjectType": 0
+      },
+      {
          "Name": "public.guilds",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.jobs",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.user_cooldowns",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.user_stats",
          "ObjectType": 0
       },
       {

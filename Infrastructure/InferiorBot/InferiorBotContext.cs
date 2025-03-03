@@ -15,12 +15,26 @@ public partial class InferiorBotContext : DbContext
 
     public virtual DbSet<ConvertedUrl> ConvertedUrls { get; set; }
 
+    public virtual DbSet<Game> Games { get; set; }
+
+    public virtual DbSet<GameType> GameTypes { get; set; }
+
+    public virtual DbSet<GameUser> GameUsers { get; set; }
+
     public virtual DbSet<Guild> Guilds { get; set; }
+
+    public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserCooldown> UserCooldowns { get; set; }
+
+    public virtual DbSet<UserStat> UserStats { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("uuid-ossp");
+
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
             entity.HasKey(e => new { e.GuildId, e.ChannelId, e.MessageId }).HasName("converted_urls_pkey1");
@@ -41,7 +55,6 @@ public partial class InferiorBotContext : DbContext
                 .HasColumnName("date_posted");
             entity.Property(e => e.OriginalUrl)
                 .IsRequired()
-                .HasMaxLength(2048)
                 .HasColumnName("original_url");
             entity.Property(e => e.UserId)
                 .HasPrecision(19)
@@ -56,6 +69,84 @@ public partial class InferiorBotContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("converted_urls_user_id_fkey1");
+        });
+
+        modelBuilder.Entity<Game>(entity =>
+        {
+            entity.HasKey(e => e.GameId).HasName("games_pkey");
+
+            entity.ToTable("games");
+
+            entity.HasIndex(e => e.GameId, "games_game_id_key").IsUnique();
+
+            entity.Property(e => e.GameId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("game_id");
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_date");
+            entity.Property(e => e.GameData)
+                .IsRequired()
+                .HasColumnType("json")
+                .HasColumnName("game_data");
+            entity.Property(e => e.GameTypeId).HasColumnName("game_type_id");
+            entity.Property(e => e.GuildId)
+                .HasPrecision(19)
+                .HasColumnName("guild_id");
+
+            entity.HasOne(d => d.GameType).WithMany(p => p.Games)
+                .HasForeignKey(d => d.GameTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("games_game_type_id_fkey");
+
+            entity.HasOne(d => d.Guild).WithMany(p => p.Games)
+                .HasForeignKey(d => d.GuildId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("games_guild_id_fkey");
+        });
+
+        modelBuilder.Entity<GameType>(entity =>
+        {
+            entity.HasKey(e => e.GameTypeId).HasName("game_types_pkey");
+
+            entity.ToTable("game_types");
+
+            entity.HasIndex(e => e.Name, "game_types_name_key").IsUnique();
+
+            entity.Property(e => e.GameTypeId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("game_type_id");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<GameUser>(entity =>
+        {
+            entity.HasKey(e => new { e.GameId, e.UserId }).HasName("game_users_pkey");
+
+            entity.ToTable("game_users");
+
+            entity.HasIndex(e => new { e.GameId, e.UserId }, "game_users_game_id_user_id_key").IsUnique();
+
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.UserData)
+                .HasColumnType("json")
+                .HasColumnName("user_data");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameUsers)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("game_users_game_id_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.GameUsers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("game_users_user_id_fkey");
         });
 
         modelBuilder.Entity<Guild>(entity =>
@@ -74,12 +165,37 @@ public partial class InferiorBotContext : DbContext
                 .HasDefaultValueSql("ARRAY[]::numeric[]")
                 .HasColumnType("numeric(19,0)[]")
                 .HasColumnName("bot_channels");
-            entity.Property(e => e.ConvertUrls).HasColumnName("convert_urls");
+            entity.Property(e => e.ConvertUrls)
+                .HasDefaultValue(false)
+                .HasColumnName("convert_urls");
             entity.Property(e => e.DjRoles)
                 .IsRequired()
                 .HasDefaultValueSql("ARRAY[]::numeric[]")
                 .HasColumnType("numeric(19,0)[]")
                 .HasColumnName("dj_roles");
+        });
+
+        modelBuilder.Entity<Job>(entity =>
+        {
+            entity.HasKey(e => e.JobId).HasName("jobs_pkey");
+
+            entity.ToTable("jobs");
+
+            entity.Property(e => e.JobId)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("job_id");
+            entity.Property(e => e.Cooldown).HasColumnName("cooldown");
+            entity.Property(e => e.JobTitle)
+                .IsRequired()
+                .HasColumnName("job_title");
+            entity.Property(e => e.PayMax)
+                .HasColumnType("money")
+                .HasColumnName("pay_max");
+            entity.Property(e => e.PayMin)
+                .HasColumnType("money")
+                .HasColumnName("pay_min");
+            entity.Property(e => e.Probability).HasColumnName("probability");
+            entity.Property(e => e.RiskLevel).HasColumnName("risk_level");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -97,7 +213,88 @@ public partial class InferiorBotContext : DbContext
                 .HasDefaultValueSql("100")
                 .HasColumnType("money")
                 .HasColumnName("balance");
-            entity.Property(e => e.Banned).HasColumnName("banned");
+            entity.Property(e => e.Banned)
+                .HasDefaultValue(false)
+                .HasColumnName("banned");
+            entity.Property(e => e.JobId).HasColumnName("job_id");
+            entity.Property(e => e.Level)
+                .HasPrecision(4)
+                .HasDefaultValueSql("1")
+                .HasColumnName("level");
+            entity.Property(e => e.Xp)
+                .HasDefaultValue(0)
+                .HasColumnName("xp");
+        });
+
+        modelBuilder.Entity<UserCooldown>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("user_cooldowns_pkey");
+
+            entity.ToTable("user_cooldowns");
+
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.DailyCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("daily_cooldown");
+            entity.Property(e => e.WorkCooldown)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("work_cooldown");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserCooldown)
+                .HasForeignKey<UserCooldown>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("user_cooldowns_user_id_fkey");
+        });
+
+        modelBuilder.Entity<UserStat>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("user_stats_pkey");
+
+            entity.ToTable("user_stats");
+
+            entity.Property(e => e.UserId)
+                .HasPrecision(19)
+                .HasColumnName("user_id");
+            entity.Property(e => e.AllTimeLost)
+                .HasColumnType("money")
+                .HasColumnName("all_time_lost");
+            entity.Property(e => e.AllTimeWon)
+                .HasColumnType("money")
+                .HasColumnName("all_time_won");
+            entity.Property(e => e.BiggestLoss)
+                .HasColumnType("money")
+                .HasColumnName("biggest_loss");
+            entity.Property(e => e.BiggestWin)
+                .HasColumnType("money")
+                .HasColumnName("biggest_win");
+            entity.Property(e => e.CoinFlipLosses)
+                .HasPrecision(10)
+                .HasColumnName("coin_flip_losses");
+            entity.Property(e => e.CoinFlipWins)
+                .HasPrecision(10)
+                .HasColumnName("coin_flip_wins");
+            entity.Property(e => e.DailyCount)
+                .HasPrecision(10)
+                .HasColumnName("daily_count");
+            entity.Property(e => e.DailyStreak)
+                .HasPrecision(10)
+                .HasColumnName("daily_streak");
+            entity.Property(e => e.GuessLosses)
+                .HasPrecision(10)
+                .HasColumnName("guess_losses");
+            entity.Property(e => e.GuessWins)
+                .HasPrecision(10)
+                .HasColumnName("guess_wins");
+            entity.Property(e => e.WorkCount)
+                .HasPrecision(10)
+                .HasColumnName("work_count");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserStat)
+                .HasForeignKey<UserStat>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("user_stats_user_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);
