@@ -194,5 +194,16 @@ namespace InferiorBot.Classes
 
             return $"{new UriBuilder(uri) { Host = $"{subdomain}{(subdomain.Length > 0 ? "." : string.Empty)}{host}", Query = string.Empty, Port = -1}}";
         }
+
+        public static double GetWinPercentage(decimal? winCount, decimal? lossCount)
+        {
+            winCount ??= 0m;
+            lossCount ??= 0m;
+
+            var totalCount = winCount + lossCount;
+            if (totalCount == 0m) return 0.00;
+
+            return Convert.ToDouble(winCount) / Convert.ToDouble(totalCount) * 100.00;
+        }
     }
 }
