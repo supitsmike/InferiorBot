@@ -26,7 +26,7 @@ namespace InferiorBot.Classes
                 { "x", "x.com" },
                 { "twitter", "twitter.com" },
                 { "TwitFix", "vxtwitter.com" },
-                { "EmbedEZ", "twitterez.com" }
+                { "EmbedEZ", "xeezz.com" }
             };
             var tiktokUrls = new Dictionary<string, string>
             {
@@ -169,7 +169,7 @@ namespace InferiorBot.Classes
                     if (twitterUrls.DoesValueExist(host, type))
                     {
                         subdomain = "www";
-                        host = "twitterez.com";
+                        host = "xeezz.com";
                         break;
                     }
                     if (tiktokUrls.DoesValueExist(host, type))
