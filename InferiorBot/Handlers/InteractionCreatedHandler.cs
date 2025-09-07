@@ -39,10 +39,10 @@ namespace InferiorBot.Handlers
             if (interactionContext.Interaction is ISlashCommandInteraction)
             {
                 var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext, cancellationToken);
-                var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => channel.Id == interactionContext.Channel.Id && guildData.BotChannels.Contains(channel.Id));
+                var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => channel.Id == interactionContext.Channel.Id && guildData.BotChannels.Contains(Convert.ToString(channel.Id)));
                 if (channel == null)
                 {
-                    var botChannels = interactionContext.Guild.Channels.Where(x => guildData.BotChannels.Contains(x.Id)).ToList();
+                    var botChannels = interactionContext.Guild.Channels.Where(x => guildData.BotChannels.Contains(Convert.ToString(x.Id))).ToList();
                     if (botChannels.Count > 0)
                     {
                         var channelMentions = string.Empty;

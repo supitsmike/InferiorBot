@@ -11,13 +11,15 @@ namespace InferiorBot.Extensions
         public static async Task<User> GetUserDataAsync(this SocketUser user, InferiorBotContext context, IServiceProvider services, CancellationToken cancellationToken = default)
         {
             var configuration = services.GetRequiredService<IConfiguration>();
+
+            var userId = Convert.ToString(user.Id);
             var userData = await context.Users.Include(x => x.UserStat).Include(x => x.UserCooldown)
-                .FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken);
+                .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
             if (userData == null)
             {
                 userData = new User
                 {
-                    UserId = user.Id,
+                    UserId = userId,
                     Balance = configuration.GetValue<decimal>("Settings:StartingBalance"),
                     Banned = false
                 };
@@ -27,11 +29,11 @@ namespace InferiorBot.Extensions
             if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync(cancellationToken);
 
             userData.UserStat ??=
-                await context.UserStats.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken) ??
+                await context.UserStats.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken) ??
                 new UserStat();
 
             userData.UserCooldown ??=
-                await context.UserCooldowns.FirstOrDefaultAsync(x => x.UserId == user.Id, cancellationToken) ??
+                await context.UserCooldowns.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken) ??
                 new UserCooldown();
 
             await context.Entry(userData).ReloadAsync(cancellationToken);

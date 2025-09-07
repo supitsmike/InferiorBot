@@ -155,7 +155,8 @@ namespace InferiorBot.Modules
                 description = string.Empty;
                 foreach (var user in users)
                 {
-                    var guildUser = Context.Guild.Users.FirstOrDefault(guildUser => guildUser.Id == user.UserId);
+                    var userId = Convert.ToUInt64(user.UserId);
+                    var guildUser = Context.Guild.Users.FirstOrDefault(guildUser => guildUser.Id == userId);
                     if (guildUser == null) continue;
 
                     description += $"{++userNumber}. {guildUser.Username} - {Format.Bold($"{user.Balance:C}")}{Environment.NewLine}";
