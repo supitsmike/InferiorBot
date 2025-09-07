@@ -28,9 +28,9 @@ namespace InferiorBot
             };
 
 #if DEBUG
-            socketConfig.LogLevel = LogSeverity.Info;
-#else
             socketConfig.LogLevel = LogSeverity.Debug;
+#else
+            socketConfig.LogLevel = LogSeverity.Info;
 #endif
 
             var services = new ServiceCollection()
