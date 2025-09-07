@@ -18,8 +18,8 @@ namespace InferiorBot.Classes
             var instagramUrls = new Dictionary<string, string>
             {
                 { "instagram", "instagram.com" },
-                { "InstaFix", "ddinstagram.com" },
-                { "EmbedEZ", "instagramez.com" }
+                { "InstaFix", "kkinstagram.com" },
+                { "EmbedEZ", "g.embedez.com" }
             };
             var twitterUrls = new Dictionary<string, string>
             {
@@ -78,8 +78,8 @@ namespace InferiorBot.Classes
                 case "InstaFix":
                     if (instagramUrls.DoesValueExist(host, type))
                     {
-                        subdomain = "g";
-                        host = "ddinstagram.com";
+                        subdomain = "www";
+                        host = "kkinstagram.com";
                         break;
                     }
                     subdomain = string.Empty;
@@ -162,8 +162,8 @@ namespace InferiorBot.Classes
                 case "EmbedEZ":
                     if (instagramUrls.DoesValueExist(host, type))
                     {
-                        subdomain = "www";
-                        host = "instagramez.com";
+                        subdomain = "g";
+                        host = "embedez.com";
                         break;
                     }
                     if (twitterUrls.DoesValueExist(host, type))
