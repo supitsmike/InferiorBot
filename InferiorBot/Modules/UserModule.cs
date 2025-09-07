@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using InferiorBot.Classes;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
-using System.Runtime.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace InferiorBot.Modules
@@ -13,12 +12,13 @@ namespace InferiorBot.Modules
     public class UserModule(InferiorBotContext context, IServiceProvider services) : BaseUserModule(context, services)
     {
         private readonly InferiorBotContext _context = context;
+        private readonly IServiceProvider _services = services;
 
         [SlashCommand("stats", "View your or another user's game stats.")]
         public async Task UserStats([Summary(description: "The user's stats you want to view.")] SocketUser? user = null)
         {
             user ??= Context.User;
-            if (user != Context.User) UserData = await user.GetUserDataAsync(_context, services);
+            if (user != Context.User) UserData = await user.GetUserDataAsync(_context, _services);
 
             await DeferAsync();
             
