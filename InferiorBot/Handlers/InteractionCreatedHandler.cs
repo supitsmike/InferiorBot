@@ -45,17 +45,33 @@ namespace InferiorBot.Handlers
                     var botChannels = interactionContext.Guild.Channels.Where(x => guildData.BotChannels.Contains(Convert.ToString(x.Id))).ToList();
                     if (botChannels.Count > 0)
                     {
-                        var channelMentions = string.Empty;
-                        for (var i = 0; i < botChannels.Count; i++)
+                        var guildUser = interactionContext.User as SocketGuildUser;
+                        var accessibleBotChannels = botChannels.Where(botChannel =>
                         {
-                            var botChannel = botChannels[i];
-                            channelMentions += DiscordFormatter.Mention(botChannel);
+                            if (botChannel is not SocketTextChannel textChannel) return false;
 
-                            if (i + 1 == botChannels.Count - 1) channelMentions += ", or ";
-                            else if (i + 1 != botChannels.Count) channelMentions += ", ";
+                            var permissions = guildUser?.GetPermissions(textChannel);
+                            return permissions is { ViewChannel: true, SendMessages: true };
+                        }).ToList();
+
+                        if (accessibleBotChannels.Count > 0)
+                        {
+                            var channelMentions = string.Empty;
+                            for (var i = 0; i < accessibleBotChannels.Count; i++)
+                            {
+                                var botChannel = accessibleBotChannels[i];
+                                channelMentions += DiscordFormatter.Mention(botChannel);
+
+                                if (i + 1 == accessibleBotChannels.Count - 1) channelMentions += ", or ";
+                                else if (i + 1 != accessibleBotChannels.Count) channelMentions += ", ";
+                            }
+
+                            await interactionContext.Interaction.RespondAsync($"You can only use bot commands in {channelMentions}.", ephemeral: true);
                         }
-
-                        await interactionContext.Interaction.RespondAsync($"You can only use bot commands in {channelMentions}.", ephemeral: true);
+                        else
+                        {
+                            await interactionContext.Interaction.RespondAsync("You don't have access to use any bot commands.", ephemeral: true);
+                        }
                         return;
                     }
                 }
