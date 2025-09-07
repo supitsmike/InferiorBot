@@ -19,7 +19,7 @@ namespace InferiorBot.Classes
             {
                 { "instagram", "instagram.com" },
                 { "InstaFix", "kkinstagram.com" },
-                { "EmbedEZ", "g.embedez.com" }
+                { "EmbedEZ", "embedez.com" }
             };
             var twitterUrls = new Dictionary<string, string>
             {
