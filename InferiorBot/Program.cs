@@ -24,9 +24,14 @@ namespace InferiorBot
                 GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans |
                                  GatewayIntents.GuildVoiceStates | GatewayIntents.GuildMessages |
                                  GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages |
-                                 GatewayIntents.DirectMessageReactions | GatewayIntents.MessageContent,
-                LogLevel = LogSeverity.Debug,
+                                 GatewayIntents.DirectMessageReactions | GatewayIntents.MessageContent
             };
+
+#if DEBUG
+            socketConfig.LogLevel = LogSeverity.Info;
+#else
+            socketConfig.LogLevel = LogSeverity.Debug;
+#endif
 
             var services = new ServiceCollection()
                 .AddSingleton<IConfiguration>(configuration)
@@ -57,8 +62,7 @@ namespace InferiorBot
             var listener = services.GetRequiredService<DiscordEventListener>();
             await listener.StartAsync();
 
-            await Task.Delay(Timeout.Infinite);
-            //try { await Task.Delay(Timeout.Infinite); } catch { /*ignored*/ }
+            try { await Task.Delay(Timeout.Infinite); } catch { /*ignored*/ }
         }
     }
 }
