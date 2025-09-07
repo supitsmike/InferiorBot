@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.user_cooldowns
 (
-    user_id numeric(19,0) NOT NULL,
+    user_id text COLLATE pg_catalog."default" NOT NULL,
     daily_cooldown timestamp without time zone,
     work_cooldown timestamp without time zone,
     CONSTRAINT user_cooldowns_pkey PRIMARY KEY (user_id),

@@ -7,11 +7,11 @@ namespace Infrastructure.InferiorBot;
 
 public partial class Guild
 {
-    public decimal GuildId { get; set; }
+    public string GuildId { get; set; }
 
-    public List<decimal> BotChannels { get; set; }
+    public List<string> BotChannels { get; set; }
 
-    public List<decimal> DjRoles { get; set; }
+    public List<string> DjRoles { get; set; }
 
     public bool ConvertUrls { get; set; }
 

@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.user_stats
 (
-    user_id numeric(19,0) NOT NULL,
+    user_id text COLLATE pg_catalog."default" NOT NULL,
     all_time_won money NOT NULL DEFAULT 0,
     all_time_lost money NOT NULL DEFAULT 0,
     biggest_win money NOT NULL DEFAULT 0,

@@ -7,7 +7,7 @@ namespace Infrastructure.InferiorBot;
 
 public partial class UserStat
 {
-    public decimal UserId { get; set; }
+    public string UserId { get; set; }
 
     public decimal AllTimeWon { get; set; }
 

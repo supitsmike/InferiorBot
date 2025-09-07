@@ -4,9 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.games
 (
-    game_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    game_id uuid NOT NULL DEFAULT uuid_generate_v7(),
     game_type_id uuid NOT NULL,
-    guild_id numeric(19,0) NOT NULL,
+    guild_id text COLLATE pg_catalog."default" NOT NULL,
     game_data json NOT NULL,
     created_date timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT games_pkey PRIMARY KEY (game_id),

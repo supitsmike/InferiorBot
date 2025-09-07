@@ -7,13 +7,13 @@ namespace Infrastructure.InferiorBot;
 
 public partial class ConvertedUrl
 {
-    public decimal GuildId { get; set; }
+    public string GuildId { get; set; }
 
-    public decimal ChannelId { get; set; }
+    public string ChannelId { get; set; }
 
-    public decimal MessageId { get; set; }
+    public string MessageId { get; set; }
 
-    public decimal UserId { get; set; }
+    public string UserId { get; set; }
 
     public string OriginalUrl { get; set; }
 

@@ -7,17 +7,11 @@ namespace Infrastructure.InferiorBot;
 
 public partial class User
 {
-    public decimal UserId { get; set; }
+    public string UserId { get; set; }
 
     public decimal Balance { get; set; }
 
     public bool Banned { get; set; }
-
-    public decimal Level { get; set; }
-
-    public int Xp { get; set; }
-
-    public int? JobId { get; set; }
 
     public virtual ICollection<ConvertedUrl> ConvertedUrls { get; set; } = new List<ConvertedUrl>();
 

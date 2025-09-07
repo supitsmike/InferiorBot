@@ -205,7 +205,7 @@ namespace InferiorBot.Modules
                 var game = new InferiorGame
                 {
                     GameTypeId = gameType.GameTypeId,
-                    GuildId = Context.Guild.Id,
+                    GuildId = Convert.ToString(Context.Guild.Id),
                     GameData = gameData.ToJson()
                 };
                 await _context.Games.AddAsync(game);
@@ -274,7 +274,8 @@ namespace InferiorBot.Modules
                     description = $"{Format.Bold($"Winner{(winners.Count > 1 ? 's' : string.Empty)}:")}";
                     foreach (var gameUser in winners)
                     {
-                        var guildUser = Context.Guild.Users.FirstOrDefault(x => x.Id == gameUser.UserId);
+                        var userId = Convert.ToUInt64(gameUser.UserId);
+                        var guildUser = Context.Guild.Users.FirstOrDefault(x => x.Id == userId);
                         if (guildUser == null) continue;
 
                         description += $"{Environment.NewLine}{DiscordFormatter.Mention(guildUser)}";

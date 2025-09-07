@@ -4,8 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.audit_log
 (
-    log_id uuid NOT NULL DEFAULT uuid_generate_v4(),
-    user_id numeric(19,0) NOT NULL,
+    log_id uuid NOT NULL DEFAULT uuid_generate_v7(),
+    user_id text COLLATE pg_catalog."default" NOT NULL,
     table_name character varying(64) COLLATE pg_catalog."default" NOT NULL,
     column_name character varying(64) COLLATE pg_catalog."default" NOT NULL,
     previous_data text COLLATE pg_catalog."default",

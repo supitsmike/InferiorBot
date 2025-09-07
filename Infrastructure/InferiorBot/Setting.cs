@@ -5,13 +5,11 @@ using System.Collections.Generic;
 
 namespace Infrastructure.InferiorBot;
 
-public partial class GameType
+public partial class Setting
 {
-    public Guid GameTypeId { get; set; }
+    public Guid SettingId { get; set; }
 
     public string Name { get; set; }
 
-    public bool Enabled { get; set; }
-
-    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
+    public string Value { get; set; }
 }

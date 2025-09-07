@@ -29,10 +29,13 @@ namespace InferiorBot.Modules
             AuthorName = $"{Context.User.Username}{(Context.User.Discriminator != "0000" ? $"#{Context.User.Discriminator}" : string.Empty)}";
             AuthorIconUrl = Context.User.GetDisplayAvatarUrl() ?? Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
 
+            var guildId = Convert.ToString(Context.Guild.Id);
+            var channelId = Convert.ToString(Context.Channel.Id);
+
             GuildData = await Context.Guild.GetGuildDataAsync(context);
             UserData = await Context.User.GetUserDataAsync(context, services);
-            ActiveGames = await context.Games.Include(x => x.GameUsers).Where(x => x.GuildId == Context.Guild.Id).ToListAsync();
-            ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == Context.Guild.Id && x.ChannelId == Context.Channel.Id).ToListAsync();
+            ActiveGames = await context.Games.Include(x => x.GameUsers).Where(x => x.GuildId == guildId).ToListAsync();
+            ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == guildId && x.ChannelId == channelId).ToListAsync();
 
             await base.BeforeExecuteAsync(command);
         }

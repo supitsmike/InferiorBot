@@ -34,8 +34,11 @@ namespace InferiorBot.Handlers
                 var guildData = await channel.Guild.GetGuildDataAsync(context, cancellationToken);
                 if (guildData.ConvertUrls == false) return;
 
+                var guildId = Convert.ToString(channel.Guild.Id);
+                var channelId = Convert.ToString(channel.Id);
+
                 var url = new Uri(message.Content).RemoveQuery();
-                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == channel.Guild.Id && x.ChannelId == channel.Id && x.OriginalUrl == url, cancellationToken);
+                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl == url, cancellationToken);
                 if (previousMessage != null)
                 {
                     await message.Channel.SendMessageAsync(previousMessage.UserId == user.UserId
@@ -92,9 +95,9 @@ namespace InferiorBot.Handlers
             {
                 var newPost = new ConvertedUrl
                 {
-                    GuildId = channel.Guild.Id,
-                    ChannelId = channel.Id,
-                    MessageId = replyMessage.Id,
+                    GuildId = Convert.ToString(channel.Guild.Id),
+                    ChannelId = Convert.ToString(channel.Id),
+                    MessageId = Convert.ToString(replyMessage.Id),
                     UserId = user.UserId,
                     OriginalUrl = new Uri(message.Content).RemoveQuery(),
                     DatePosted = message.Timestamp.DateTime.ToLocalTime()
