@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.game_users
 (
     game_id uuid NOT NULL,
-    user_id numeric(19,0) NOT NULL,
+    user_id text COLLATE pg_catalog."default" NOT NULL,
     user_data json,
     CONSTRAINT game_users_pkey PRIMARY KEY (game_id, user_id),
     CONSTRAINT game_users_game_id_user_id_key UNIQUE (game_id, user_id),

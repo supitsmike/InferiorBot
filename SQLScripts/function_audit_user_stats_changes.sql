@@ -162,6 +162,40 @@ BEGIN
         	    NEW.coin_flip_losses
         	);
 		END IF;
+		
+		-- guess_wins
+		IF NEW.guess_wins IS DISTINCT FROM OLD.guess_wins THEN
+        	INSERT INTO audit_log (
+        	    user_id,
+        	    table_name,
+        	    column_name,
+        	    previous_data,
+        	    new_data
+        	) VALUES (
+        	    OLD.user_id,
+        	    'user_stats',
+        	    'guess_wins',
+        	    OLD.guess_wins,
+        	    NEW.guess_wins
+        	);
+		END IF;
+		
+		-- guess_losses
+		IF NEW.guess_losses IS DISTINCT FROM OLD.guess_losses THEN
+        	INSERT INTO audit_log (
+        	    user_id,
+        	    table_name,
+        	    column_name,
+        	    previous_data,
+        	    new_data
+        	) VALUES (
+        	    OLD.user_id,
+        	    'user_stats',
+        	    'guess_losses',
+        	    OLD.guess_losses,
+        	    NEW.guess_losses
+        	);
+		END IF;
     END IF;
 	RETURN NEW;
 END;

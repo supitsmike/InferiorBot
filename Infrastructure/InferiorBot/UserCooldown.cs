@@ -7,7 +7,7 @@ namespace Infrastructure.InferiorBot;
 
 public partial class UserCooldown
 {
-    public decimal UserId { get; set; }
+    public string UserId { get; set; }
 
     public DateTime? DailyCooldown { get; set; }
 

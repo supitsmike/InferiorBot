@@ -40,13 +40,14 @@ namespace InferiorBot.Modules
             [SlashCommand("bot-channel", "Set the channel you want to use as a bot commands channel.")]
             public async Task AddBotChannel([Summary(description: "The channel you want to use as a bot commands channel.")] SocketChannel channel)
             {
-                if (GuildData.BotChannels.Contains(channel.Id))
+                var channelId = Convert.ToString(channel.Id);
+                if (GuildData.BotChannels.Contains(channelId))
                 {
                     await RespondAsync($"Channel {DiscordFormatter.Mention(channel)} is already set as a bot commands channel.", ephemeral: true);
                     return;
                 }
 
-                GuildData.BotChannels.Add(channel.Id);
+                GuildData.BotChannels.Add(channelId);
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -60,13 +61,14 @@ namespace InferiorBot.Modules
             [SlashCommand("dj-role", "Set the role you want to allow to use the music commands.")]
             public async Task AddDjRole([Summary(description: "The role you want to allow use of music commands.")] SocketRole role)
             {
-                if (GuildData.DjRoles.Contains(role.Id))
+                var roleId = Convert.ToString(role.Id);
+                if (GuildData.DjRoles.Contains(roleId))
                 {
                     await RespondAsync($"Role {DiscordFormatter.Mention(role)} is already set a DJ role", ephemeral: true);
                     return;
                 }
 
-                GuildData.DjRoles.Add(role.Id);
+                GuildData.DjRoles.Add(roleId);
                 if (!_context.ChangeTracker.HasChanges())
                 {
                     await RespondAsync("Failed to update guild settings.", ephemeral: true);
@@ -91,14 +93,16 @@ namespace InferiorBot.Modules
                     await RespondAsync("There are currently no bot commands channel set.", ephemeral: true);
                     return;
                 }
-                if (channel != null && GuildData.BotChannels.Find(x => x == channel.Id) == default)
+
+                var channelId = Convert.ToString(channel?.Id);
+                if (channel != null && GuildData.BotChannels.Find(x => x == channelId) == null)
                 {
                     await RespondAsync("This channel is not currently set as a bot commands channel.", ephemeral: true);
                     return;
                 }
 
                 if (channel == null) GuildData.BotChannels.Clear();
-                else GuildData.BotChannels.Remove(channel.Id);
+                else GuildData.BotChannels.Remove(channelId);
 
                 if (!_context.ChangeTracker.HasChanges())
                 {
@@ -120,14 +124,16 @@ namespace InferiorBot.Modules
                     await RespondAsync("There are currently no DJ roles set.", ephemeral: true);
                     return;
                 }
-                if (role != null && GuildData.DjRoles.Find(x => x == role.Id) == default)
+
+                var roleId = Convert.ToString(role?.Id);
+                if (role != null && GuildData.DjRoles.Find(x => x == roleId) == null)
                 {
                     await RespondAsync("This role is not currently set to have DJ permissions.", ephemeral: true);
                     return;
                 }
 
                 if (role == null) GuildData.DjRoles.Clear();
-                else GuildData.DjRoles.Remove(role.Id);
+                else GuildData.DjRoles.Remove(roleId);
 
                 if (!_context.ChangeTracker.HasChanges())
                 {

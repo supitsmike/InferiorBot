@@ -23,7 +23,7 @@ public partial class InferiorBotContext : DbContext
 
     public virtual DbSet<Guild> Guilds { get; set; }
 
-    public virtual DbSet<Job> Jobs { get; set; }
+    public virtual DbSet<Setting> Settings { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -33,23 +33,17 @@ public partial class InferiorBotContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresExtension("uuid-ossp");
+        modelBuilder.HasPostgresExtension("pg_uuidv7");
 
         modelBuilder.Entity<ConvertedUrl>(entity =>
         {
-            entity.HasKey(e => new { e.GuildId, e.ChannelId, e.MessageId }).HasName("converted_urls_pkey1");
+            entity.HasKey(e => new { e.GuildId, e.ChannelId, e.MessageId }).HasName("converted_urls_pkey");
 
             entity.ToTable("converted_urls");
 
-            entity.Property(e => e.GuildId)
-                .HasPrecision(19)
-                .HasColumnName("guild_id");
-            entity.Property(e => e.ChannelId)
-                .HasPrecision(19)
-                .HasColumnName("channel_id");
-            entity.Property(e => e.MessageId)
-                .HasPrecision(19)
-                .HasColumnName("message_id");
+            entity.Property(e => e.GuildId).HasColumnName("guild_id");
+            entity.Property(e => e.ChannelId).HasColumnName("channel_id");
+            entity.Property(e => e.MessageId).HasColumnName("message_id");
             entity.Property(e => e.DatePosted)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("date_posted");
@@ -57,7 +51,7 @@ public partial class InferiorBotContext : DbContext
                 .IsRequired()
                 .HasColumnName("original_url");
             entity.Property(e => e.UserId)
-                .HasPrecision(19)
+                .IsRequired()
                 .HasColumnName("user_id");
 
             entity.HasOne(d => d.Guild).WithMany(p => p.ConvertedUrls)
@@ -68,7 +62,7 @@ public partial class InferiorBotContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.ConvertedUrls)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("converted_urls_user_id_fkey1");
+                .HasConstraintName("converted_urls_user_id_fkey");
         });
 
         modelBuilder.Entity<Game>(entity =>
@@ -77,10 +71,8 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("games");
 
-            entity.HasIndex(e => e.GameId, "games_game_id_key").IsUnique();
-
             entity.Property(e => e.GameId)
-                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasDefaultValueSql("uuid_generate_v7()")
                 .HasColumnName("game_id");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -92,7 +84,7 @@ public partial class InferiorBotContext : DbContext
                 .HasColumnName("game_data");
             entity.Property(e => e.GameTypeId).HasColumnName("game_type_id");
             entity.Property(e => e.GuildId)
-                .HasPrecision(19)
+                .IsRequired()
                 .HasColumnName("guild_id");
 
             entity.HasOne(d => d.GameType).WithMany(p => p.Games)
@@ -115,8 +107,11 @@ public partial class InferiorBotContext : DbContext
             entity.HasIndex(e => e.Name, "game_types_name_key").IsUnique();
 
             entity.Property(e => e.GameTypeId)
-                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasDefaultValueSql("uuid_generate_v7()")
                 .HasColumnName("game_type_id");
+            entity.Property(e => e.Enabled)
+                .HasDefaultValue(false)
+                .HasColumnName("enabled");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasColumnName("name");
@@ -128,12 +123,8 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("game_users");
 
-            entity.HasIndex(e => new { e.GameId, e.UserId }, "game_users_game_id_user_id_key").IsUnique();
-
             entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.UserData)
                 .HasColumnType("json")
                 .HasColumnName("user_data");
@@ -155,47 +146,35 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("guilds");
 
-            entity.HasIndex(e => e.GuildId, "guilds_guild_id_key").IsUnique();
-
-            entity.Property(e => e.GuildId)
-                .HasPrecision(19)
-                .HasColumnName("guild_id");
+            entity.Property(e => e.GuildId).HasColumnName("guild_id");
             entity.Property(e => e.BotChannels)
                 .IsRequired()
-                .HasDefaultValueSql("ARRAY[]::numeric[]")
-                .HasColumnType("numeric(19,0)[]")
+                .HasDefaultValueSql("ARRAY[]::text[]")
                 .HasColumnName("bot_channels");
             entity.Property(e => e.ConvertUrls)
                 .HasDefaultValue(false)
                 .HasColumnName("convert_urls");
             entity.Property(e => e.DjRoles)
                 .IsRequired()
-                .HasDefaultValueSql("ARRAY[]::numeric[]")
-                .HasColumnType("numeric(19,0)[]")
+                .HasDefaultValueSql("ARRAY[]::text[]")
                 .HasColumnName("dj_roles");
         });
 
-        modelBuilder.Entity<Job>(entity =>
+        modelBuilder.Entity<Setting>(entity =>
         {
-            entity.HasKey(e => e.JobId).HasName("jobs_pkey");
+            entity.HasKey(e => e.SettingId).HasName("settings_pkey");
 
-            entity.ToTable("jobs");
+            entity.ToTable("settings");
 
-            entity.Property(e => e.JobId)
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("job_id");
-            entity.Property(e => e.Cooldown).HasColumnName("cooldown");
-            entity.Property(e => e.JobTitle)
+            entity.Property(e => e.SettingId)
+                .HasDefaultValueSql("uuid_generate_v7()")
+                .HasColumnName("setting_id");
+            entity.Property(e => e.Name)
                 .IsRequired()
-                .HasColumnName("job_title");
-            entity.Property(e => e.PayMax)
-                .HasColumnType("money")
-                .HasColumnName("pay_max");
-            entity.Property(e => e.PayMin)
-                .HasColumnType("money")
-                .HasColumnName("pay_min");
-            entity.Property(e => e.Probability).HasColumnName("probability");
-            entity.Property(e => e.RiskLevel).HasColumnName("risk_level");
+                .HasColumnName("name");
+            entity.Property(e => e.Value)
+                .IsRequired()
+                .HasColumnName("value");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -204,11 +183,7 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("users");
 
-            entity.HasIndex(e => e.UserId, "users_user_id_key").IsUnique();
-
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.Balance)
                 .HasDefaultValueSql("100")
                 .HasColumnType("money")
@@ -216,14 +191,6 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.Banned)
                 .HasDefaultValue(false)
                 .HasColumnName("banned");
-            entity.Property(e => e.JobId).HasColumnName("job_id");
-            entity.Property(e => e.Level)
-                .HasPrecision(4)
-                .HasDefaultValueSql("1")
-                .HasColumnName("level");
-            entity.Property(e => e.Xp)
-                .HasDefaultValue(0)
-                .HasColumnName("xp");
         });
 
         modelBuilder.Entity<UserCooldown>(entity =>
@@ -232,9 +199,7 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("user_cooldowns");
 
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.DailyCooldown)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("daily_cooldown");
@@ -254,9 +219,7 @@ public partial class InferiorBotContext : DbContext
 
             entity.ToTable("user_stats");
 
-            entity.Property(e => e.UserId)
-                .HasPrecision(19)
-                .HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.AllTimeLost)
                 .HasColumnType("money")
                 .HasColumnName("all_time_lost");

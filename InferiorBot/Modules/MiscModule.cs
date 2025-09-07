@@ -78,7 +78,7 @@ namespace InferiorBot.Modules
                     Name = Context.User.GetUserName(),
                     IconUrl = Context.User.GetDisplayAvatarUrl()
                 },
-                Color = new Color(0),
+                Color = Color.Default,
                 Title = "Magic 8 Ball",
                 Description = $"{question}",
                 Footer = new EmbedFooterBuilder

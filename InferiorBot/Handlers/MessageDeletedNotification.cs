@@ -18,8 +18,8 @@ namespace InferiorBot.Handlers
         public async Task Handle(MessageDeletedNotification notification, CancellationToken cancellationToken)
         {
             var context = notification.Context;
-            var messageId = notification.Message.Id;
-            var channelId = notification.MessageChannel.Id;
+            var messageId = Convert.ToString(notification.Message.Id);
+            var channelId = Convert.ToString(notification.MessageChannel.Id);
 
             var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.ChannelId == channelId && x.MessageId == messageId, cancellationToken);
             if (previousMessage != null)

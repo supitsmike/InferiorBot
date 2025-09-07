@@ -45,7 +45,8 @@ namespace InferiorBot.Modules
                 return;
             }
 
-            var previousPost = ConvertedUrls.FirstOrDefault(x => x.MessageId == interaction.Message.Id);
+            var messageId = Convert.ToString(interaction.Message.Id);
+            var previousPost = ConvertedUrls.FirstOrDefault(x => x.MessageId == messageId);
             if (previousPost != null)
             {
                 _context.ConvertedUrls.Remove(previousPost);

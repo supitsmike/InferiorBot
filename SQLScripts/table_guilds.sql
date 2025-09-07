@@ -4,9 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.guilds
 (
-    guild_id numeric(19,0) NOT NULL,
-    bot_channels numeric(19,0)[] NOT NULL DEFAULT ARRAY[]::numeric[],
-    dj_roles numeric(19,0)[] NOT NULL DEFAULT ARRAY[]::numeric[],
+    guild_id text COLLATE pg_catalog."default" NOT NULL,
+    bot_channels text[] COLLATE pg_catalog."default" NOT NULL DEFAULT ARRAY[]::text[],
+    dj_roles text[] COLLATE pg_catalog."default" NOT NULL DEFAULT ARRAY[]::text[],
     convert_urls boolean NOT NULL DEFAULT false,
     CONSTRAINT guilds_pkey PRIMARY KEY (guild_id),
     CONSTRAINT guilds_guild_id_key UNIQUE (guild_id)

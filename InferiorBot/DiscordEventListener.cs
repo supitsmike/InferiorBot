@@ -9,9 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InferiorBot
 {
-    public class DiscordEventListener(DiscordSocketClient client, InteractionService handler, InferiorBotContext context, IMediator mediator, IServiceProvider services)
+    public class DiscordEventListener(DiscordSocketClient client, InteractionService handler, InferiorBotContext context, IMediator mediator, IServiceProvider services) : IDisposable
     {
-        private readonly CancellationToken _cancellationToken = new CancellationTokenSource().Token;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        private CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         public async Task StartAsync()
         {
@@ -31,27 +32,34 @@ namespace InferiorBot
 
         private Task OnLogAsync(LogMessage message)
         {
-            return mediator.Publish(new LogNotification(message), _cancellationToken);
+            return mediator.Publish(new LogNotification(message), CancellationToken);
         }
 
         private Task OnReadyAsync()
         {
-            return mediator.Publish(new ReadyNotification(handler, services), _cancellationToken);
+            return mediator.Publish(new ReadyNotification(handler, services), CancellationToken);
         }
 
         private Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> message, Cacheable<IMessageChannel, ulong> messageChannel)
         {
-            return mediator.Publish(new MessageDeletedNotification(message, messageChannel, context), _cancellationToken);
+            return mediator.Publish(new MessageDeletedNotification(message, messageChannel, context), CancellationToken);
         }
 
         private Task OnMessageReceivedAsync(SocketMessage message)
         {
-            return mediator.Publish(new MessageReceivedNotification(message, context, services), _cancellationToken);
+            return mediator.Publish(new MessageReceivedNotification(message, context, services), CancellationToken);
         }
 
         private Task OnInteractionCreatedAsync(SocketInteraction interaction)
         {
-            return mediator.Publish(new InteractionCreatedNotification(client, handler, interaction, context, services), _cancellationToken);
+            return mediator.Publish(new InteractionCreatedNotification(client, handler, interaction, context, services), CancellationToken);
+        }
+
+        public void Dispose()
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

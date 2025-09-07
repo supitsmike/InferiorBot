@@ -11,7 +11,7 @@ public partial class Game
 
     public Guid GameTypeId { get; set; }
 
-    public decimal GuildId { get; set; }
+    public string GuildId { get; set; }
 
     public string GameData { get; set; }
 

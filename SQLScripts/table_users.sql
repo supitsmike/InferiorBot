@@ -4,12 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.users
 (
-    user_id numeric(19,0) NOT NULL,
+    user_id text COLLATE pg_catalog."default" NOT NULL,
     balance money NOT NULL DEFAULT 100,
     banned boolean NOT NULL DEFAULT false,
-    level numeric(4,0) NOT NULL DEFAULT 1,
-    xp integer NOT NULL DEFAULT 0,
-    job_id integer,
     CONSTRAINT users_pkey PRIMARY KEY (user_id),
     CONSTRAINT users_user_id_key UNIQUE (user_id)
 )
