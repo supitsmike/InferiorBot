@@ -481,8 +481,7 @@ namespace InferiorBot.Modules
         public async Task RideTheBusFollowupCommand(string answer)
         {
             if (Context.Interaction is not IComponentInteraction interaction) return;
-            if (!interaction.IntegrationOwners.TryGetValue(ApplicationIntegrationType.UserInstall, out var userId)) return;
-            if (interaction.User.Id != userId)
+            if (interaction.User.Id != interaction.Message.InteractionMetadata.UserId)
             {
                 await RespondAsync("You are not the owner of this game!", ephemeral: true);
                 return;
