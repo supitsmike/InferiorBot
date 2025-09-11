@@ -520,7 +520,7 @@ namespace InferiorBot.Modules
             };
             var componentBuilder = new ComponentBuilder();
 
-            var roundMultipliers = new[] { 2m, 3m, 5m, 10m };
+            var roundMultipliers = new[] { 2m, 3m, 4m, 20m };
             var currentRound = Array.FindIndex(gameData.RevealedCards, x => !x);
             
             var wonRound = false;
