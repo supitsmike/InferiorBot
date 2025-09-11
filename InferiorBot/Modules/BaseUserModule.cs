@@ -1,3 +1,4 @@
+﻿using Discord;
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
 using InferiorBot.Extensions;
@@ -12,6 +13,7 @@ namespace InferiorBot.Modules
     {
         protected IConfiguration Configuration = null!;
         protected IReadOnlyCollection<SocketApplicationCommand> Commands = null!;
+        protected IReadOnlyCollection<Emote> Emotes = null!;
 
         protected string? AuthorName;
         protected string? AuthorIconUrl;
@@ -25,6 +27,7 @@ namespace InferiorBot.Modules
         {
             Configuration = services.GetRequiredService<IConfiguration>();
             Commands = await Context.Client.GetGlobalApplicationCommandsAsync();
+            Emotes = await Context.Client.GetApplicationEmotesAsync();
 
             AuthorName = $"{Context.User.Username}{(Context.User.Discriminator != "0000" ? $"#{Context.User.Discriminator}" : string.Empty)}";
             AuthorIconUrl = Context.User.GetDisplayAvatarUrl() ?? Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
