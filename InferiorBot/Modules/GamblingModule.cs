@@ -525,6 +525,7 @@ namespace InferiorBot.Modules
             
             var wonRound = false;
             var wonGame = false;
+            var cashOut = false;
             var currentMultiplier = currentRound >= 0 && currentRound < roundMultipliers.Length 
                 ? roundMultipliers[currentRound] 
                 : 1m;
@@ -652,7 +653,7 @@ namespace InferiorBot.Modules
                             };
                         }
 
-                        wonGame = true;
+                        cashOut = true;
                         embedBuilder.Color = Color.Gold;
                         UserData.UserStat.RideTheBusWins++;
                         _context.Games.Remove(game);
@@ -667,61 +668,64 @@ namespace InferiorBot.Modules
                 }
             }
 
-            if (wonRound)
+            if (!cashOut)
             {
-                game.GameData = gameData.ToJson();
+                if (wonRound)
+                {
+                    game.GameData = gameData.ToJson();
 
-                if (wonGame)
+                    if (wonGame)
+                    {
+                        if (currentReward > 0m)
+                        {
+                            UserData.WonMoney(currentReward);
+
+                            embedBuilder.Description = $"You won {Format.Bold($"{currentReward:C}")}!";
+                            embedBuilder.Footer = new EmbedFooterBuilder
+                            {
+                                Text = $"New balance is {UserData.Balance:C}"
+                            };
+                        }
+                        else
+                        {
+                            embedBuilder.Description = "You won!";
+                        }
+
+                        UserData.UserStat.RideTheBusWins++;
+                        _context.Games.Remove(game);
+
+                        embedBuilder.Color = Color.Gold;
+                    }
+                    else
+                    {
+                        if (nextReward > 0m)
+                        {
+                            embedBuilder.Description += $"{Environment.NewLine}{Environment.NewLine}Correct guess wins {Format.Bold($"{nextReward:C}")}!";
+                            embedBuilder.Footer = new EmbedFooterBuilder
+                            {
+                                Text = $"Cash Out now and win {currentReward:C}"
+                            };
+                            componentBuilder.WithButton("Cash Out", "ridethebus:cashout", ButtonStyle.Danger);
+                        }
+
+                        embedBuilder.Color = Color.DarkGreen;
+                    }
+                }
+                else
                 {
                     if (currentReward > 0m)
                     {
-                        UserData.WonMoney(currentReward);
-
-                        embedBuilder.Description = $"You won {Format.Bold($"{currentReward:C}")}!";
+                        UserData.LostMoney(gameData.BetAmount, false);
                         embedBuilder.Footer = new EmbedFooterBuilder
                         {
                             Text = $"New balance is {UserData.Balance:C}"
                         };
                     }
-                    else
-                    {
-                        embedBuilder.Description = "You won!";
-                    }
-
-                    UserData.UserStat.RideTheBusWins++;
+                    UserData.UserStat.RideTheBusLosses++;
                     _context.Games.Remove(game);
 
-                    embedBuilder.Color = Color.Gold;
+                    embedBuilder.Color = Color.DarkRed;
                 }
-                else
-                {
-                    if (nextReward > 0m)
-                    {
-                        embedBuilder.Description += $"{Environment.NewLine}{Environment.NewLine}Correct guess wins {Format.Bold($"{nextReward:C}")}!";
-                        embedBuilder.Footer = new EmbedFooterBuilder
-                        {
-                            Text = $"Cash Out now and win {currentReward:C}"
-                        };
-                        componentBuilder.WithButton("Cash Out", "ridethebus:cashout", ButtonStyle.Danger);
-                    }
-
-                    embedBuilder.Color = Color.DarkGreen;
-                }
-            }
-            else
-            {
-                if (currentReward > 0m)
-                {
-                    UserData.LostMoney(gameData.BetAmount, false);
-                    embedBuilder.Footer = new EmbedFooterBuilder
-                    {
-                        Text = $"New balance is {UserData.Balance:C}"
-                    };
-                }
-                UserData.UserStat.RideTheBusLosses++;
-                _context.Games.Remove(game);
-
-                embedBuilder.Color = Color.DarkRed;
             }
 
             if (!_context.ChangeTracker.HasChanges())
