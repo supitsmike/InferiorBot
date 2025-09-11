@@ -604,7 +604,7 @@ namespace InferiorBot.Modules
                     {
                         embedBuilder.Description = $"What is the {Format.Bold("Suit")} of the fourth card?";
                         componentBuilder
-                            .WithButton("Spade", "ridethebus:spade", ButtonStyle.Secondary)
+                            .WithButton("Spades", "ridethebus:spades", ButtonStyle.Secondary)
                             .WithButton("Diamonds", "ridethebus:diamonds", ButtonStyle.Secondary)
                             .WithButton("Clubs", "ridethebus:clubs", ButtonStyle.Secondary)
                             .WithButton("Hearts", "ridethebus:hearts", ButtonStyle.Secondary);
@@ -620,7 +620,7 @@ namespace InferiorBot.Modules
 
                     break;
                 }
-                case 3 when answer is "spade" or "diamonds" or "clubs" or "hearts":
+                case 3 when answer is "spades" or "diamonds" or "clubs" or "hearts":
                 {
                     var suit = gameData.Cards[3].Suit.ToString();
 
