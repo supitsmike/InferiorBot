@@ -710,6 +710,14 @@ namespace InferiorBot.Modules
             }
             else
             {
+                if (currentReward > 0m)
+                {
+                    UserData.LostMoney(gameData.BetAmount, false);
+                    embedBuilder.Footer = new EmbedFooterBuilder
+                    {
+                        Text = $"New balance is {UserData.Balance:C}"
+                    };
+                }
                 UserData.UserStat.RideTheBusLosses++;
                 _context.Games.Remove(game);
 
