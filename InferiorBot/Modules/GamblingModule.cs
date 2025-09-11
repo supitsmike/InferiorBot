@@ -526,13 +526,17 @@ namespace InferiorBot.Modules
             var wonRound = false;
             var wonGame = false;
             var cashOut = false;
-            var currentMultiplier = currentRound >= 0 && currentRound < roundMultipliers.Length 
-                ? roundMultipliers[currentRound] 
+            var previousMultiplier = currentRound > 0 && currentRound < roundMultipliers.Length
+                ? roundMultipliers[currentRound - 1]
                 : 1m;
+            var currentMultiplier = currentRound >= 0 && currentRound < roundMultipliers.Length
+                ? roundMultipliers[currentRound]
+                : previousMultiplier;
             var nextMultiplier = currentRound + 1 < roundMultipliers.Length 
                 ? roundMultipliers[currentRound + 1] 
                 : currentMultiplier;
 
+            var previousReward = gameData.BetAmount * previousMultiplier;
             var currentReward = gameData.BetAmount * currentMultiplier;
             var nextReward = gameData.BetAmount * nextMultiplier;
 
@@ -563,8 +567,8 @@ namespace InferiorBot.Modules
                 }
                 case 1 when answer is "higher" or "lower":
                 {
-                    var firstCard = gameData.Cards[0].Rank.IsAce ? 11 : gameData.Cards[0].Rank.Number;
-                    var secondCard = gameData.Cards[1].Rank.IsAce ? 11 : gameData.Cards[1].Rank.Number;
+                    var firstCard = gameData.Cards[0].Rank.IsAce ? 11 : gameData.Cards[0].Rank.ComparisonValue;
+                    var secondCard = gameData.Cards[1].Rank.IsAce ? 11 : gameData.Cards[1].Rank.ComparisonValue;
                     var isHigher = secondCard > firstCard;
                     var isLower = secondCard < firstCard;
                     var isEqual = secondCard == firstCard;
@@ -589,9 +593,9 @@ namespace InferiorBot.Modules
                 }
                 case 2 when answer is "inbetween" or "outside":
                 {
-                    var firstCard = gameData.Cards[0].Rank.IsAce ? 11 : gameData.Cards[0].Rank.Number;
-                    var secondCard = gameData.Cards[1].Rank.IsAce ? 11 : gameData.Cards[1].Rank.Number;
-                    var thirdCard = gameData.Cards[2].Rank.IsAce ? 11 : gameData.Cards[2].Rank.Number;
+                    var firstCard = gameData.Cards[0].Rank.IsAce ? 11 : gameData.Cards[0].Rank.ComparisonValue;
+                    var secondCard = gameData.Cards[1].Rank.IsAce ? 11 : gameData.Cards[1].Rank.ComparisonValue;
+                    var thirdCard = gameData.Cards[2].Rank.IsAce ? 11 : gameData.Cards[2].Rank.ComparisonValue;
 
                     var lowCard = Math.Min(firstCard, secondCard);
                     var highCard = Math.Max(firstCard, secondCard);
@@ -643,10 +647,10 @@ namespace InferiorBot.Modules
                 {
                     if (answer == "cashout")
                     {
-                        if (currentReward > 0m)
+                        if (previousReward > 0m)
                         {
-                            UserData.WonMoney(currentReward);
-                            embedBuilder.Description = $"You cashed out and won {Format.Bold($"{currentReward:C}")}!";
+                            UserData.WonMoney(previousReward);
+                            embedBuilder.Description = $"You cashed out and won {Format.Bold($"{previousReward:C}")}!";
                             embedBuilder.Footer = new EmbedFooterBuilder
                             {
                                 Text = $"New balance is {UserData.Balance:C}"
