@@ -31,5 +31,9 @@ public partial class UserStat
 
     public decimal GuessLosses { get; set; }
 
+    public decimal RideTheBusWins { get; set; }
+
+    public decimal RideTheBusLosses { get; set; }
+
     public virtual User User { get; set; }
 }

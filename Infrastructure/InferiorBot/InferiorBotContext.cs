@@ -83,9 +83,8 @@ public partial class InferiorBotContext : DbContext
                 .HasColumnType("json")
                 .HasColumnName("game_data");
             entity.Property(e => e.GameTypeId).HasColumnName("game_type_id");
-            entity.Property(e => e.GuildId)
-                .IsRequired()
-                .HasColumnName("guild_id");
+            entity.Property(e => e.GuildId).HasColumnName("guild_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.GameType).WithMany(p => p.Games)
                 .HasForeignKey(d => d.GameTypeId)
@@ -94,8 +93,11 @@ public partial class InferiorBotContext : DbContext
 
             entity.HasOne(d => d.Guild).WithMany(p => p.Games)
                 .HasForeignKey(d => d.GuildId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("games_guild_id_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Games)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("games_user_id_fkey");
         });
 
         modelBuilder.Entity<GameType>(entity =>
@@ -250,6 +252,12 @@ public partial class InferiorBotContext : DbContext
             entity.Property(e => e.GuessWins)
                 .HasPrecision(10)
                 .HasColumnName("guess_wins");
+            entity.Property(e => e.RideTheBusLosses)
+                .HasPrecision(10)
+                .HasColumnName("ride_the_bus_losses");
+            entity.Property(e => e.RideTheBusWins)
+                .HasPrecision(10)
+                .HasColumnName("ride_the_bus_wins");
             entity.Property(e => e.WorkCount)
                 .HasPrecision(10)
                 .HasColumnName("work_count");
