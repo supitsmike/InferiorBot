@@ -196,6 +196,40 @@ BEGIN
         	    NEW.guess_losses
         	);
 		END IF;
+		
+		-- ride_the_bus_wins
+		IF NEW.ride_the_bus_wins IS DISTINCT FROM OLD.ride_the_bus_wins THEN
+        	INSERT INTO audit_log (
+        	    user_id,
+        	    table_name,
+        	    column_name,
+        	    previous_data,
+        	    new_data
+        	) VALUES (
+        	    OLD.user_id,
+        	    'user_stats',
+        	    'ride_the_bus_wins',
+        	    OLD.ride_the_bus_wins,
+        	    NEW.ride_the_bus_wins
+        	);
+		END IF;
+		
+		-- ride_the_bus_losses
+		IF NEW.ride_the_bus_losses IS DISTINCT FROM OLD.ride_the_bus_losses THEN
+        	INSERT INTO audit_log (
+        	    user_id,
+        	    table_name,
+        	    column_name,
+        	    previous_data,
+        	    new_data
+        	) VALUES (
+        	    OLD.user_id,
+        	    'user_stats',
+        	    'ride_the_bus_losses',
+        	    OLD.ride_the_bus_losses,
+        	    NEW.ride_the_bus_losses
+        	);
+		END IF;
     END IF;
 	RETURN NEW;
 END;
