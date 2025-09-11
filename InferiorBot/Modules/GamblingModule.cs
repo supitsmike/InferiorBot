@@ -526,13 +526,17 @@ namespace InferiorBot.Modules
             var wonRound = false;
             var wonGame = false;
             var cashOut = false;
-            var currentMultiplier = currentRound >= 0 && currentRound < roundMultipliers.Length 
-                ? roundMultipliers[currentRound] 
+            var previousMultiplier = currentRound > 0 && currentRound < roundMultipliers.Length
+                ? roundMultipliers[currentRound - 1]
                 : 1m;
+            var currentMultiplier = currentRound >= 0 && currentRound < roundMultipliers.Length
+                ? roundMultipliers[currentRound]
+                : previousMultiplier;
             var nextMultiplier = currentRound + 1 < roundMultipliers.Length 
                 ? roundMultipliers[currentRound + 1] 
                 : currentMultiplier;
 
+            var previousReward = gameData.BetAmount * previousMultiplier;
             var currentReward = gameData.BetAmount * currentMultiplier;
             var nextReward = gameData.BetAmount * nextMultiplier;
 
@@ -643,10 +647,10 @@ namespace InferiorBot.Modules
                 {
                     if (answer == "cashout")
                     {
-                        if (currentReward > 0m)
+                        if (previousReward > 0m)
                         {
-                            UserData.WonMoney(currentReward);
-                            embedBuilder.Description = $"You cashed out and won {Format.Bold($"{currentReward:C}")}!";
+                            UserData.WonMoney(previousReward);
+                            embedBuilder.Description = $"You cashed out and won {Format.Bold($"{previousReward:C}")}!";
                             embedBuilder.Footer = new EmbedFooterBuilder
                             {
                                 Text = $"New balance is {UserData.Balance:C}"
