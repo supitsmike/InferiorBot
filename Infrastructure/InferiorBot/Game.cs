@@ -13,6 +13,8 @@ public partial class Game
 
     public string GuildId { get; set; }
 
+    public string UserId { get; set; }
+
     public string GameData { get; set; }
 
     public DateTime CreatedDate { get; set; }
@@ -22,4 +24,6 @@ public partial class Game
     public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
     public virtual Guild Guild { get; set; }
+
+    public virtual User User { get; set; }
 }
