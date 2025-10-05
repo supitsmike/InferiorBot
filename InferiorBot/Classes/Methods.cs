@@ -44,7 +44,7 @@ namespace InferiorBot.Classes
             if (string.IsNullOrEmpty(type) && host.Equals(instagramUrls["instagram"], StringComparison.OrdinalIgnoreCase))
             {
                 website = "instagram";
-                type = "EmbedEZ";
+                type = "InstaFix";
             }
             if (string.IsNullOrEmpty(type) && (host.Equals(twitterUrls["x"], StringComparison.OrdinalIgnoreCase) ||
                                                host.Equals(twitterUrls["twitter"], StringComparison.OrdinalIgnoreCase)))
