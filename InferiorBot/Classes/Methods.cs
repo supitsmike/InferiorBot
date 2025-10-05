@@ -9,7 +9,6 @@ namespace InferiorBot.Classes
             website = string.Empty;
 
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return string.Empty;
-            if (uri.Scheme != "http" && uri.Scheme != "https") return string.Empty;
 
             var subdomain = uri.GetSubdomain();
             var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)

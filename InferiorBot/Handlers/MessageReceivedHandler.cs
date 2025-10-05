@@ -39,7 +39,6 @@ namespace InferiorBot.Handlers
 
 
                 var uri = new Uri(message.Content);
-                if (uri.Scheme != "http" && uri.Scheme != "https") return;
 
                 var subdomain = uri.GetSubdomain();
                 var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
