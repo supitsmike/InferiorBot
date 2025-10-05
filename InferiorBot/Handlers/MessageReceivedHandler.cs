@@ -55,7 +55,7 @@ namespace InferiorBot.Handlers
                     }.Uri;
                 }
 
-                var url = uri.RemoveQuery().ToLower();
+                var url = uri.RemoveQuery();
                 var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl.ToLower() == url, cancellationToken);
                 if (previousMessage != null)
                 {
