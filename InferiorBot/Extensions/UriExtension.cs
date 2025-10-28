@@ -4,7 +4,7 @@
     {
         public static string GetSubdomain(this Uri uri)
         {
-            var host = uri.Host;
+            var host = uri.Host.ToLower();
             var parts = host.Split('.');
 
             if (parts.Length <= 2) return string.Empty;
@@ -22,7 +22,7 @@
 
         public static string RemoveQuery(this Uri uri)
         {
-            return $"{new UriBuilder(uri) { Host = uri.Host, Query = string.Empty, Port = -1 }}";
+            return $"{new UriBuilder(uri) { Host = uri.Host.ToLower(), Query = string.Empty, Port = -1 }}";
         }
 
         public static string RemoveQueryAndNormalize(this Uri uri)

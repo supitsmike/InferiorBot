@@ -7,7 +7,13 @@ namespace InferiorBot.Extensions
     {
         public static bool IsValidUrl(this string s)
         {
-            return !string.IsNullOrWhiteSpace(s) && Uri.IsWellFormedUriString(s, UriKind.Absolute);
+            if (string.IsNullOrWhiteSpace(s)) return false;
+            if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false) return false;
+
+            if (!Uri.TryCreate(s, UriKind.Absolute, out var uri)) return false;
+            if (uri.Scheme != "http" && uri.Scheme != "https") return false;
+
+            return true;
         }
 
         public static T? ToObject<T>(this string s)

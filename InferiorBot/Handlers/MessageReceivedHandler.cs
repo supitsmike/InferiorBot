@@ -58,6 +58,25 @@ namespace InferiorBot.Handlers
 
                 var guildId = Convert.ToString(channel.Guild.Id);
                 var channelId = Convert.ToString(channel.Id);
+
+                var uri = new Uri(message.Content);
+
+                var subdomain = uri.GetSubdomain();
+                var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
+                    ? uri.Host[(subdomain.Length > 0 ? subdomain.Length + 1 : 0)..]
+                    : uri.Host;
+
+                if (host is "x.com")
+                {
+                    host = "twitter.com";
+                    uri = new UriBuilder(uri)
+                    {
+                        Host = $"{subdomain}{(subdomain.Length > 0 ? "." : string.Empty)}{host}", Query = string.Empty,
+                        Port = -1
+                    }.Uri;
+                }
+
+                var url = uri.RemoveQuery();
                 var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl.ToLower() == url, cancellationToken);
                 if (previousMessage != null)
                 {

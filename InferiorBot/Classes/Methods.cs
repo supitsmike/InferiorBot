@@ -11,9 +11,9 @@ namespace InferiorBot.Classes
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return string.Empty;
 
             var subdomain = uri.GetSubdomain();
-            var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
+            var host = (uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
                 ? uri.Host[(subdomain.Length > 0 ? subdomain.Length + 1 : 0)..]
-                : uri.Host;
+                : uri.Host).ToLower();
 
             var instagramUrls = new Dictionary<string, string>
             {
