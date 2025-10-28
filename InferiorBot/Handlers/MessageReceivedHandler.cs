@@ -28,6 +28,30 @@ namespace InferiorBot.Handlers
             var user = await message.Author.GetUserDataAsync(context, services, cancellationToken);
             if (user.Banned) return;
 
+            var uri = new Uri(message.Content);
+            var subdomain = uri.GetSubdomain();
+            var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
+                ? uri.Host[(subdomain.Length > 0 ? subdomain.Length + 1 : 0)..]
+                : uri.Host;
+
+            if (host is "x.com") host = "twitter.com";
+            else if (host is "tiktok.com")
+            {
+                var redirectedUri = await uri.ResolveRedirectAsync(cancellationToken);
+                if (redirectedUri != null)
+                {
+                    uri = redirectedUri;
+                }
+            }
+
+            uri = new UriBuilder(uri)
+            {
+                Host = host,
+                Query = string.Empty,
+                Port = -1
+            }.Uri;
+            var url = uri.RemoveQuery().ToLower();
+
             var channel = message.Channel as SocketGuildChannel;
             if (channel != null)
             {
@@ -36,24 +60,6 @@ namespace InferiorBot.Handlers
 
                 var guildId = Convert.ToString(channel.Guild.Id);
                 var channelId = Convert.ToString(channel.Id);
-
-                var uri = new Uri(message.Content);
-                var subdomain = uri.GetSubdomain();
-                var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
-                    ? uri.Host[(subdomain.Length > 0 ? subdomain.Length + 1 : 0)..]
-                    : uri.Host;
-
-                if (host is "x.com")
-                {
-                    host = "twitter.com";
-                    uri = new UriBuilder(uri)
-                    {
-                        Host = $"{subdomain}{(subdomain.Length > 0 ? "." : string.Empty)}{host}", Query = string.Empty,
-                        Port = -1
-                    }.Uri;
-                }
-
-                var url = uri.RemoveQuery().ToLower();
                 var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl.ToLower() == url, cancellationToken);
                 if (previousMessage != null)
                 {
@@ -115,7 +121,7 @@ namespace InferiorBot.Handlers
                     ChannelId = Convert.ToString(channel.Id),
                     MessageId = Convert.ToString(replyMessage.Id),
                     UserId = user.UserId,
-                    OriginalUrl = new Uri(message.Content).RemoveQuery(),
+                    OriginalUrl = new Uri(url).RemoveQuery(),
                     DatePosted = message.Timestamp.DateTime.ToLocalTime()
                 };
                 await context.ConvertedUrls.AddAsync(newPost, cancellationToken);
