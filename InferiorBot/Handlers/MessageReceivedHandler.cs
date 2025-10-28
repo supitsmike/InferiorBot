@@ -30,27 +30,25 @@ namespace InferiorBot.Handlers
 
             var uri = new Uri(message.Content);
             var subdomain = uri.GetSubdomain();
+            var path = uri.AbsolutePath;
             var host = uri.Host.StartsWith(subdomain, StringComparison.OrdinalIgnoreCase)
                 ? uri.Host[(subdomain.Length > 0 ? subdomain.Length + 1 : 0)..]
                 : uri.Host;
 
             if (host is "x.com") host = "twitter.com";
-            else if (host is "tiktok.com")
+            else if (host is "tiktok.com" && subdomain == "vm")
             {
-                var redirectedUri = await uri.ResolveRedirectAsync(cancellationToken);
-                if (redirectedUri != null)
-                {
-                    uri = redirectedUri;
-                }
+                path = $"/t{path}";
             }
 
             uri = new UriBuilder(uri)
             {
                 Host = host,
+                Path = path,
                 Query = string.Empty,
                 Port = -1
             }.Uri;
-            var url = uri.RemoveQuery().ToLower();
+            var url = uri.RemoveQueryAndNormalize();
 
             var channel = message.Channel as SocketGuildChannel;
             if (channel != null)
