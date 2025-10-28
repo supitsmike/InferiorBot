@@ -24,5 +24,38 @@
         {
             return $"{new UriBuilder(uri) { Host = uri.Host, Query = string.Empty, Port = -1 }}";
         }
+
+        public static async Task<Uri?> ResolveRedirectAsync(this Uri uri, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var httpClient = new HttpClient(new HttpClientHandler
+                {
+                    AllowAutoRedirect = false
+                });
+                httpClient.Timeout = TimeSpan.FromSeconds(5);
+
+                var response = await httpClient.GetAsync(uri, cancellationToken);
+
+                if (response.StatusCode != System.Net.HttpStatusCode.MovedPermanently &&
+                    response.StatusCode != System.Net.HttpStatusCode.Found &&
+                    response.StatusCode != System.Net.HttpStatusCode.SeeOther &&
+                    response.StatusCode != System.Net.HttpStatusCode.TemporaryRedirect &&
+                    response.StatusCode != System.Net.HttpStatusCode.PermanentRedirect) return uri;
+
+                var location = response.Headers.Location;
+                if (location == null) return uri;
+
+                if (location.IsAbsoluteUri == false)
+                {
+                    location = new Uri(uri, location);
+                }
+                return location;
+            }
+            catch
+            {
+                return uri;
+            }
+        }
     }
 }
