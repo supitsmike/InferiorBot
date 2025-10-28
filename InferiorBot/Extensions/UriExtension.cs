@@ -25,6 +25,11 @@
             return $"{new UriBuilder(uri) { Host = uri.Host, Query = string.Empty, Port = -1 }}";
         }
 
+        public static string RemoveQueryAndNormalize(this Uri uri)
+        {
+            return $"{new UriBuilder(uri) { Scheme = uri.Scheme.ToLower(), Host = uri.Host.ToLower(), Query = string.Empty, Port = -1 }}";
+        }
+
         public static async Task<Uri?> ResolveRedirectAsync(this Uri uri, CancellationToken cancellationToken = default)
         {
             try
