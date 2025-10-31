@@ -48,7 +48,7 @@ namespace InferiorBot.Handlers
                 Query = string.Empty,
                 Port = -1
             }.Uri;
-            var url = uri.RemoveQueryAndNormalize();
+            var url = host != "twitter.com" ? uri.RemoveQueryAndNormalize(false) : uri.RemoveQueryAndNormalize(true);
 
             var channel = message.Channel as SocketGuildChannel;
             if (channel != null)

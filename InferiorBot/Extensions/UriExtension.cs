@@ -25,9 +25,9 @@
             return $"{new UriBuilder(uri) { Host = uri.Host, Query = string.Empty, Port = -1 }}";
         }
 
-        public static string RemoveQueryAndNormalize(this Uri uri)
+        public static string RemoveQueryAndNormalize(this Uri uri, bool normalizePath)
         {
-            return $"{new UriBuilder(uri) { Scheme = uri.Scheme.ToLower(), Host = uri.Host.ToLower(), Query = string.Empty, Port = -1 }}";
+            return $"{new UriBuilder(uri) { Scheme = uri.Scheme.ToLower(), Host = uri.Host.ToLower(), Path = normalizePath ? uri.AbsolutePath.ToLower() : uri.AbsolutePath, Query = string.Empty, Port = -1 }}";
         }
 
         public static async Task<Uri?> ResolveRedirectAsync(this Uri uri, CancellationToken cancellationToken = default)
