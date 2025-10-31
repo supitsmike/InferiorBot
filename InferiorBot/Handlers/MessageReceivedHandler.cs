@@ -58,7 +58,7 @@ namespace InferiorBot.Handlers
 
                 var guildId = Convert.ToString(channel.Guild.Id);
                 var channelId = Convert.ToString(channel.Id);
-                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl.ToLower() == url, cancellationToken);
+                var previousMessage = await context.ConvertedUrls.FirstOrDefaultAsync(x => x.GuildId == guildId && x.ChannelId == channelId && x.OriginalUrl == url, cancellationToken);
                 if (previousMessage != null)
                 {
                     await message.Channel.SendMessageAsync(previousMessage.UserId == user.UserId
