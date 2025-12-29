@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using InferiorBot.Attributes;
 using InferiorBot.Classes;
 using Infrastructure.InferiorBot;
 using Microsoft.Extensions.Configuration;
@@ -11,12 +12,13 @@ namespace InferiorBot.Modules
     {
         private readonly InferiorBotContext _context = context;
 
+        [Defer(true)]
         [SlashCommand("daily", "Claim your daily bonus.")]
         public async Task DailyBonus()
         {
             if (UserData.UserCooldown.DailyCooldown.HasValue && UserData.UserCooldown.DailyCooldown > DateTime.Now)
             {
-                await RespondAsync(embed: new EmbedBuilder
+                await FollowupAsync(embed: new EmbedBuilder
                 {
                     Title = "Daily bonus not ready",
                     Description = $"""
@@ -40,12 +42,12 @@ namespace InferiorBot.Modules
 
             if (!_context.ChangeTracker.HasChanges())
             {
-                await RespondAsync("Failed to update user.", ephemeral: true);
+                await FollowupAsync("Failed to update user.", ephemeral: true);
                 return;
             }
             await _context.SaveChangesAsync();
 
-            await RespondAsync(embed: new EmbedBuilder
+            await FollowupAsync(embed: new EmbedBuilder
             {
                 Title = "Daily Bonus",
                 Description = $"Daily bonus of {Format.Bold($"{dailyBonus:C}")} collected!",

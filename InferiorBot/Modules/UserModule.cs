@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using InferiorBot.Attributes;
 using InferiorBot.Classes;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
@@ -14,13 +15,12 @@ namespace InferiorBot.Modules
         private readonly InferiorBotContext _context = context;
         private readonly IServiceProvider _services = services;
 
+        [Defer(false)]
         [SlashCommand("stats", "View your or another user's game stats.")]
         public async Task UserStats([Summary(description: "The user's stats you want to view.")] SocketUser? user = null)
         {
             user ??= Context.User;
             if (user != Context.User) UserData = await user.GetUserDataAsync(_context, _services);
-
-            await DeferAsync();
             
             var fields = new List<EmbedFieldBuilder>();
             // All-Time Stats
@@ -143,6 +143,7 @@ namespace InferiorBot.Modules
             }.Build());
         }
 
+        [Defer(false)]
         [SlashCommand("leaderboard", "See who's at the top of the leaderboard.")]
         public async Task LeaderboardCommand()
         {
@@ -164,7 +165,7 @@ namespace InferiorBot.Modules
                 }
             }
 
-            await RespondAsync(embed: new EmbedBuilder
+            await FollowupAsync(embed: new EmbedBuilder
             {
                 Title = $"Top Users in {Context.Guild.Name}",
                 Description = description,

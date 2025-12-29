@@ -1,11 +1,14 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using InferiorBot.Attributes;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using InferiorGame = Infrastructure.InferiorBot.Game;
 
 namespace InferiorBot.Modules
@@ -36,6 +39,13 @@ namespace InferiorBot.Modules
             var userId = Convert.ToString(Context.User.Id);
             var guildId = Convert.ToString(Context.Guild.Id);
             var channelId = Convert.ToString(Context.Channel.Id);
+
+            var method = GetType().GetMethod(command.MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (method != null)
+            {
+                var attribute = method.GetCustomAttribute<DeferAttribute>();
+                if (attribute != null) await DeferAsync(ephemeral: attribute.Ephemeral);
+            }
 
             GuildData = await Context.Guild.GetGuildDataAsync(context);
             UserData = await Context.User.GetUserDataAsync(context, services);
