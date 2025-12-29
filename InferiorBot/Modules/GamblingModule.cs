@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using InferiorBot.Attributes;
 using InferiorBot.Classes;
 using InferiorBot.Extensions;
 using InferiorBot.Games;
@@ -19,6 +20,8 @@ namespace InferiorBot.Modules
             [ChoiceDisplay("heads")] Heads,
             [ChoiceDisplay("tails")] Tails
         }
+
+        [Defer]
         [SlashCommand("coinflip", "Flip a coin for a chance to double your money.")]
         public async Task CoinFlip([Summary(description: "heads or tails?")] CoinFlipEnum selection, [Summary(description: "How much money would you like to bet? (all is also valid)")] string? amount = null)
         {
@@ -41,7 +44,7 @@ namespace InferiorBot.Modules
             var (betAmount, error) = UserData.GetBetAmount(amount);
             if (!string.IsNullOrWhiteSpace(error))
             {
-                await RespondAsync(error, ephemeral: true);
+                await FollowupAsync(error);
                 return;
             }
 
@@ -60,7 +63,7 @@ namespace InferiorBot.Modules
 
                 if (!_context.ChangeTracker.HasChanges())
                 {
-                    await RespondAsync("Failed to update user.", ephemeral: true);
+                    await FollowupAsync(":x: Failed to update user.");
                     return;
                 }
                 await _context.SaveChangesAsync();
@@ -88,7 +91,7 @@ namespace InferiorBot.Modules
             var file = new FileAttachment(new MemoryStream(image), $"{sides[index]}.png");
             
             var embed = embedBuilder.Build();
-            await RespondWithFileAsync(file, embed: embed);
+            await FollowupWithFileAsync(file, embed: embed);
         }
 
         [Group("start", "Start a game.")]
@@ -96,13 +99,14 @@ namespace InferiorBot.Modules
         {
             private readonly InferiorBotContext _context = context;
 
+            [Defer]
             [SlashCommand("guess-the-number", "Who ever guesses the number closest wins.")]
             public async Task StartGuessTheNumberCommand([Summary(description: "How much money is required to play?")] string? amount = null)
             {
                 var gameType = await _context.GameTypes.FirstOrDefaultAsync(x => x.Name == "guess the number");
                 if (gameType == null)
                 {
-                    await RespondAsync("Failed to find game type.", ephemeral: true);
+                    await FollowupAsync(":x: Failed to find game type.");
                     return;
                 }
 
@@ -113,9 +117,7 @@ namespace InferiorBot.Modules
                     var activeGameData = activeGame.GetGuessTheNumberData();
                     if (activeGameData != null && DateTime.Now < activeGameData.ExpireDate)
                     {
-                        await RespondAsync(
-                            $"There is already a `Guess the Number` in progress. Do {(guess != null ? DiscordFormatter.Mention(guess) : "/guess")} to play.",
-                            ephemeral: true);
+                        await FollowupAsync($":x: There is already a `Guess the Number` in progress. Do {(guess != null ? DiscordFormatter.Mention(guess) : "/guess")} to play.");
                         return;
                     }
 
@@ -124,7 +126,7 @@ namespace InferiorBot.Modules
 
                     if (!_context.ChangeTracker.HasChanges())
                     {
-                        await RespondAsync("Failed to remove existing game.", ephemeral: true);
+                        await FollowupAsync(":x: Failed to remove existing game.");
                         return;
                     }
                     await _context.SaveChangesAsync();
@@ -140,10 +142,10 @@ namespace InferiorBot.Modules
                     switch (UserData.Balance)
                     {
                         case 0m:
-                            await RespondAsync(":x: You have no money!", ephemeral: true);
+                            await FollowupAsync(":x: You have no money!");
                             return;
                         case < 0m:
-                            await RespondAsync(":x: You are already in dept!", ephemeral: true);
+                            await FollowupAsync(":x: You are already in dept!");
                             return;
                     }
 
@@ -151,19 +153,19 @@ namespace InferiorBot.Modules
                     if (amount != "all" && !decimal.TryParse(amount, out _)) amount = "0";
                     if (amount.Contains('.') && amount.Split('.')[1].Length > 2)
                     {
-                        await RespondAsync(":x: Invalid bet amount!", ephemeral: true);
+                        await FollowupAsync(":x: Invalid bet amount!");
                         return;
                     }
 
                     var betAmount = amount == "all" ? UserData.Balance : Convert.ToDecimal(amount);
                     if (betAmount > UserData.Balance)
                     {
-                        await RespondAsync(":x: You can't bet more money than you have!", ephemeral: true);
+                        await FollowupAsync(":x: You can't bet more money than you have!");
                         return;
                     }
                     if (betAmount <= 0m)
                     {
-                        await RespondAsync(":x: You can't bet nothing!", ephemeral: true);
+                        await FollowupAsync(":x: You can't bet nothing!");
                         return;
                     }
 
@@ -179,7 +181,7 @@ namespace InferiorBot.Modules
                 await _context.Games.AddAsync(game);
                 if (!_context.ChangeTracker.HasChanges())
                 {
-                    await RespondAsync("Failed to create game.", ephemeral: true);
+                    await FollowupAsync(":x: Failed to create game.");
                     return;
                 }
                 await _context.SaveChangesAsync();
@@ -202,7 +204,7 @@ namespace InferiorBot.Modules
 
                                           """, string.Empty);
 
-                await RespondAsync(embed: new EmbedBuilder
+                await FollowupAsync(embed: new EmbedBuilder
                 {
                     Title = "Guess the Number",
                     Description = description,
@@ -217,7 +219,7 @@ namespace InferiorBot.Modules
                 gameData = game.GetGuessTheNumberData();
                 if (gameData == null)
                 {
-                    await RespondAsync("Something went wrong with the game.", ephemeral: true);
+                    await FollowupAsync(":x: Something went wrong with the game.");
                     return;
                 }
 
@@ -287,7 +289,7 @@ namespace InferiorBot.Modules
 
                 if (!_context.ChangeTracker.HasChanges())
                 {
-                    await RespondAsync("Failed to delete game.", ephemeral: true);
+                    await FollowupAsync(":x: Failed to delete game.");
                     return;
                 }
                 await _context.SaveChangesAsync();
@@ -305,20 +307,21 @@ namespace InferiorBot.Modules
             }
         }
 
+        [Defer(true)]
         [SlashCommand("guess", "Guess a number between 0 and 100.")]
         public async Task GuessCommand([Summary(description: "Enter a number between 0 and 100."), MinValue(0), MaxValue(100)] int number)
         {
             var gameType = await _context.GameTypes.FirstOrDefaultAsync(x => x.Name == "guess the number");
             if (gameType == null)
             {
-                await RespondAsync("Failed to find game type.", ephemeral: true);
+                await FollowupAsync(":x: Failed to find game type.");
                 return;
             }
 
             var activeGame = ActiveGames.FirstOrDefault(x => x.GameTypeId == gameType.GameTypeId);
             if (activeGame == null)
             {
-                await RespondAsync("There is no guess the number games in progress.", ephemeral: true);
+                await FollowupAsync(":x: There is no guess the number games in progress.");
                 return;
             }
 
@@ -330,18 +333,18 @@ namespace InferiorBot.Modules
 
                 if (!_context.ChangeTracker.HasChanges())
                 {
-                    await RespondAsync("Failed to remove existing guess the number game.", ephemeral: true);
+                    await FollowupAsync(":x: Failed to remove existing guess the number game.");
                     return;
                 }
                 await _context.SaveChangesAsync();
 
-                await RespondAsync("There is no guess the number games in progress.", ephemeral: true);
+                await FollowupAsync(":x: There is no guess the number games in progress.");
                 return;
             }
 
             if (activeGame.GameUsers.FirstOrDefault(x => x.UserId == UserData.UserId) != null)
             {
-                await RespondAsync("You have already made a guess for this game.", ephemeral: true);
+                await FollowupAsync(":x: You have already made a guess for this game.");
                 return;
             }
 
@@ -349,7 +352,7 @@ namespace InferiorBot.Modules
             {
                 if (activeGameData.BetAmount > UserData.Balance)
                 {
-                    await RespondAsync(":x: You can't bet more than you have!", ephemeral: true);
+                    await FollowupAsync(":x: You can't bet more than you have!");
                     return;
                 }
 
@@ -370,14 +373,14 @@ namespace InferiorBot.Modules
             await _context.GameUsers.AddAsync(gameUser);
             if (!_context.ChangeTracker.HasChanges())
             {
-                await RespondAsync("Failed to join guess the number game.", ephemeral: true);
+                await FollowupAsync(":x: Failed to join guess the number game.");
                 return;
             }
             await _context.SaveChangesAsync();
             await _context.Entry(gameUser).ReloadAsync();
             await _context.Entry(activeGame).ReloadAsync();
 
-            await RespondAsync(embed: new EmbedBuilder
+            await FollowupAsync(embed: new EmbedBuilder
             {
                 Title = "Guess the Number",
                 Description = $"You bet the number {Format.Bold(Convert.ToString(number))}.",
@@ -386,22 +389,23 @@ namespace InferiorBot.Modules
                 {
                     Text = activeGameData.BetAmount > 0m ? $"New balance is {UserData.Balance:C}" : null
                 }
-            }.Build(), ephemeral: true);
+            }.Build());
         }
 
+        [Defer]
         [SlashCommand("ridethebus", "Ride the bus.")]
         public async Task RideTheBusCommand([Summary(description: "How much money would you like to bet? (all is also valid)")] string? amount = null)
         {
             var gameType = await _context.GameTypes.FirstOrDefaultAsync(x => x.Name == "ride the bus");
             if (gameType == null)
             {
-                await RespondAsync("Failed to find game type.", ephemeral: true);
+                await FollowupAsync(":x: Failed to find game type.");
                 return;
             }
 
             if (ActiveGames.Any(x => x.GameTypeId == gameType.GameTypeId && x.UserId == UserData.UserId))
             {
-                await RespondAsync("You already have a game in progress.", ephemeral: true);
+                await FollowupAsync(":x: You already have a game in progress.");
                 return;
             }
 
@@ -426,7 +430,7 @@ namespace InferiorBot.Modules
             var (betAmount, error) = UserData.GetBetAmount(amount);
             if (!string.IsNullOrWhiteSpace(error))
             {
-                await RespondAsync(error, ephemeral: true);
+                await FollowupAsync(error);
                 return;
             }
 
@@ -460,7 +464,7 @@ namespace InferiorBot.Modules
 
             if (!_context.ChangeTracker.HasChanges())
             {
-                await RespondAsync("Failed to create game.", ephemeral: true);
+                await FollowupAsync(":x: Failed to create game.");
                 return;
             }
             await _context.SaveChangesAsync();
@@ -474,7 +478,7 @@ namespace InferiorBot.Modules
                 .WithButton("Black", "ridethebus:black", ButtonStyle.Secondary)
                 .WithButton("Red", "ridethebus:red", ButtonStyle.Secondary)
                 .Build();
-            await RespondWithFileAsync(cardImageFile, embed: embed, components: components);
+            await FollowupWithFileAsync(cardImageFile, embed: embed, components: components);
         }
 
         [ComponentInteraction("ridethebus:*")]
@@ -483,28 +487,28 @@ namespace InferiorBot.Modules
             if (Context.Interaction is not IComponentInteraction interaction) return;
             if (interaction.User.Id != interaction.Message.InteractionMetadata.UserId)
             {
-                await RespondAsync("You are not the owner of this game!", ephemeral: true);
+                await FollowupAsync(":x: You are not the owner of this game!");
                 return;
             }
 
             var gameType = await _context.GameTypes.FirstOrDefaultAsync(x => x.Name == "ride the bus");
             if (gameType == null)
             {
-                await RespondAsync("Failed to find game type.", ephemeral: true);
+                await FollowupAsync(":x: Failed to find game type.");
                 return;
             }
 
             var game = ActiveGames.FirstOrDefault(x => x.GameTypeId == gameType.GameTypeId && x.UserId == UserData.UserId);
             if (game == null)
             {
-                await RespondAsync("Failed to find active game.", ephemeral: true);
+                await FollowupAsync(":x: Failed to find active game.");
                 return;
             }
 
             var gameData = game.GameData.ToObject<RideTheBus>();
             if (gameData == null)
             {
-                await RespondAsync("Failed to parse game object.", ephemeral: true);
+                await FollowupAsync(":x: Failed to parse game object.");
                 return;
             }
 
@@ -664,7 +668,7 @@ namespace InferiorBot.Modules
                     }
                     else
                     {
-                        await RespondAsync("Something went wrong with the game.", ephemeral: true);
+                        await FollowupAsync(":x: Something went wrong with the game.");
                         return;
                     }
 
@@ -734,7 +738,7 @@ namespace InferiorBot.Modules
 
             if (!_context.ChangeTracker.HasChanges())
             {
-                await RespondAsync("Failed to update game. Please try again.", ephemeral: true);
+                await FollowupAsync(":x: Failed to update game. Please try again.");
                 return;
             }
             await _context.SaveChangesAsync();
