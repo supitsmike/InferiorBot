@@ -487,28 +487,28 @@ namespace InferiorBot.Modules
             if (Context.Interaction is not IComponentInteraction interaction) return;
             if (interaction.User.Id != interaction.Message.InteractionMetadata.UserId)
             {
-                await FollowupAsync(":x: You are not the owner of this game!");
+                await RespondAsync(":x: You are not the owner of this game!", ephemeral: true);
                 return;
             }
 
             var gameType = await _context.GameTypes.FirstOrDefaultAsync(x => x.Name == "ride the bus");
             if (gameType == null)
             {
-                await FollowupAsync(":x: Failed to find game type.");
+                await RespondAsync(":x: Failed to find game type.", ephemeral: true);
                 return;
             }
 
             var game = ActiveGames.FirstOrDefault(x => x.GameTypeId == gameType.GameTypeId && x.UserId == UserData.UserId);
             if (game == null)
             {
-                await FollowupAsync(":x: Failed to find active game.");
+                await RespondAsync(":x: Failed to find active game.", ephemeral: true);
                 return;
             }
 
             var gameData = game.GameData.ToObject<RideTheBus>();
             if (gameData == null)
             {
-                await FollowupAsync(":x: Failed to parse game object.");
+                await RespondAsync(":x: Failed to parse game object.", ephemeral: true);
                 return;
             }
 
@@ -668,7 +668,7 @@ namespace InferiorBot.Modules
                     }
                     else
                     {
-                        await FollowupAsync(":x: Something went wrong with the game.");
+                        await RespondAsync(":x: Something went wrong with the game.", ephemeral: true);
                         return;
                     }
 
@@ -738,7 +738,7 @@ namespace InferiorBot.Modules
 
             if (!_context.ChangeTracker.HasChanges())
             {
-                await FollowupAsync(":x: Failed to update game. Please try again.");
+                await RespondAsync(":x: Failed to update game. Please try again.", ephemeral: true);
                 return;
             }
             await _context.SaveChangesAsync();
