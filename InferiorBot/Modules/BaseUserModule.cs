@@ -29,6 +29,13 @@ namespace InferiorBot.Modules
 
         public override async Task BeforeExecuteAsync(ICommandInfo command)
         {
+            var method = GetType().GetMethod(command.MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (method != null)
+            {
+                var attribute = method.GetCustomAttribute<DeferAttribute>();
+                if (attribute != null) await DeferAsync(ephemeral: attribute.Ephemeral);
+            }
+
             Configuration = services.GetRequiredService<IConfiguration>();
             Commands = await Context.Client.GetGlobalApplicationCommandsAsync();
             Emotes = await Context.Client.GetApplicationEmotesAsync();
@@ -39,13 +46,6 @@ namespace InferiorBot.Modules
             var userId = Convert.ToString(Context.User.Id);
             var guildId = Convert.ToString(Context.Guild.Id);
             var channelId = Convert.ToString(Context.Channel.Id);
-
-            var method = GetType().GetMethod(command.MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (method != null)
-            {
-                var attribute = method.GetCustomAttribute<DeferAttribute>();
-                if (attribute != null) await DeferAsync(ephemeral: attribute.Ephemeral);
-            }
 
             GuildData = await Context.Guild.GetGuildDataAsync(context);
             UserData = await Context.User.GetUserDataAsync(context, services);
