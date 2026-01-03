@@ -52,7 +52,7 @@ namespace InferiorBot
 
         private Task OnInteractionCreatedAsync(SocketInteraction interaction)
         {
-            return mediator.Publish(new InteractionCreatedNotification(client, handler, interaction, context, services), CancellationToken);
+            return mediator.Publish(new InteractionCreatedNotification(client, handler, interaction, services), CancellationToken);
         }
 
         public void Dispose()
