@@ -1,20 +1,16 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using InferiorBot.Classes;
-using InferiorBot.Extensions;
-using Infrastructure.InferiorBot;
 using MediatR;
 using Serilog;
 
 namespace InferiorBot.Handlers
 {
-    public class InteractionCreatedNotification(DiscordSocketClient client, InteractionService handler, SocketInteraction interaction, InferiorBotContext context, IServiceProvider services) : INotification
+    public class InteractionCreatedNotification(DiscordSocketClient client, InteractionService handler, SocketInteraction interaction, IServiceProvider services) : INotification
     {
         public DiscordSocketClient Client { get; } = client ?? throw new ArgumentNullException(nameof(client));
         public InteractionService Handler { get; } = handler ?? throw new ArgumentNullException(nameof(handler));
         public SocketInteraction Interaction { get; } = interaction ?? throw new ArgumentNullException(nameof(interaction));
-        public InferiorBotContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
         public IServiceProvider Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
     }
 
@@ -25,58 +21,10 @@ namespace InferiorBot.Handlers
             var client = notification.Client;
             var handler = notification.Handler;
             var interaction = notification.Interaction;
-            var databaseContext = notification.Context;
             var services = notification.Services;
 
             var interactionContext = new SocketInteractionContext(client, interaction);
-            var user = await interactionContext.User.GetUserDataAsync(databaseContext, services, cancellationToken);
-            if (user.Banned)
-            {
-                await interactionContext.Interaction.RespondAsync("You have been banned from the bot.", ephemeral: true);
-                return;
-            }
-
-            if (interactionContext.Interaction is ISlashCommandInteraction)
-            {
-                var guildData = await interactionContext.Guild.GetGuildDataAsync(databaseContext, cancellationToken);
-                var channel = interactionContext.Guild.Channels.FirstOrDefault(channel => channel.Id == interactionContext.Channel.Id && guildData.BotChannels.Contains(Convert.ToString(channel.Id)));
-                if (channel == null)
-                {
-                    var botChannels = interactionContext.Guild.Channels.Where(x => guildData.BotChannels.Contains(Convert.ToString(x.Id))).ToList();
-                    if (botChannels.Count > 0)
-                    {
-                        var guildUser = interactionContext.User as SocketGuildUser;
-                        var accessibleBotChannels = botChannels.Where(botChannel =>
-                        {
-                            if (botChannel is not SocketTextChannel textChannel) return false;
-
-                            var permissions = guildUser?.GetPermissions(textChannel);
-                            return permissions is { ViewChannel: true, SendMessages: true };
-                        }).ToList();
-
-                        if (accessibleBotChannels.Count > 0)
-                        {
-                            var channelMentions = string.Empty;
-                            for (var i = 0; i < accessibleBotChannels.Count; i++)
-                            {
-                                var botChannel = accessibleBotChannels[i];
-                                channelMentions += DiscordFormatter.Mention(botChannel);
-
-                                if (i + 1 == accessibleBotChannels.Count - 1) channelMentions += ", or ";
-                                else if (i + 1 != accessibleBotChannels.Count) channelMentions += ", ";
-                            }
-
-                            await interactionContext.Interaction.RespondAsync($"You can only use bot commands in {channelMentions}.", ephemeral: true);
-                        }
-                        else
-                        {
-                            await interactionContext.Interaction.RespondAsync("You don't have access to use any bot commands.", ephemeral: true);
-                        }
-                        return;
-                    }
-                }
-            }
-
+            
             var result = await handler.ExecuteCommandAsync(interactionContext, services);
             if (result.IsSuccess) return;
 
@@ -96,7 +44,10 @@ namespace InferiorBot.Handlers
                     break;
             }
 
-            await interaction.RespondAsync("Something went wrong.", ephemeral: true);
+            if (interaction.HasResponded == false)
+            {
+                await interaction.RespondAsync("Something went wrong.", ephemeral: true);
+            }
         }
     }
 }

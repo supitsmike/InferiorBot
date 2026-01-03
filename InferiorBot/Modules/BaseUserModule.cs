@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using InferiorBot.Attributes;
+using InferiorBot.Classes;
 using InferiorBot.Extensions;
 using Infrastructure.InferiorBot;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,65 @@ namespace InferiorBot.Modules
             ActiveGames = await context.Games.Include(x => x.GameUsers).Where(x => x.UserId == userId || x.GuildId == guildId).ToListAsync();
             ConvertedUrls = await context.ConvertedUrls.Where(x => x.Guild.GuildId == guildId && x.ChannelId == channelId).ToListAsync();
 
+            if (UserData.Banned)
+            {
+                await RespondOrFollowupAsync("You have been banned from the bot.", ephemeral: true);
+                throw new Exception("User is banned");
+            }
+
+            if (Context.Interaction is ISlashCommandInteraction)
+            {
+                var channel = Context.Guild.Channels.FirstOrDefault(channel => channel.Id == Context.Channel.Id && GuildData.BotChannels.Contains(Convert.ToString(channel.Id)));
+                if (channel == null)
+                {
+                    var botChannels = Context.Guild.Channels.Where(x => GuildData.BotChannels.Contains(Convert.ToString(x.Id))).ToList();
+                    if (botChannels.Count > 0)
+                    {
+                        var guildUser = Context.User as SocketGuildUser;
+                        var accessibleBotChannels = botChannels.Where(botChannel =>
+                        {
+                            if (botChannel is not SocketTextChannel textChannel) return false;
+
+                            var permissions = guildUser?.GetPermissions(textChannel);
+                            return permissions is { ViewChannel: true, SendMessages: true };
+                        }).ToList();
+
+                        if (accessibleBotChannels.Count > 0)
+                        {
+                            var channelMentions = string.Empty;
+                            for (var i = 0; i < accessibleBotChannels.Count; i++)
+                            {
+                                var botChannel = accessibleBotChannels[i];
+                                channelMentions += DiscordFormatter.Mention(botChannel);
+
+                                if (i + 1 == accessibleBotChannels.Count - 1) channelMentions += ", or ";
+                                else if (i + 1 != accessibleBotChannels.Count) channelMentions += ", ";
+                            }
+
+                            await RespondOrFollowupAsync($"You can only use bot commands in {channelMentions}.", ephemeral: true);
+                        }
+                        else
+                        {
+                            await RespondOrFollowupAsync("You don't have access to use any bot commands.", ephemeral: true);
+                        }
+                        throw new Exception("Invalid channel");
+                    }
+                }
+            }
+
             await base.BeforeExecuteAsync(command);
+        }
+
+        protected async Task RespondOrFollowupAsync(string message, bool ephemeral = true)
+        {
+            if (Context.Interaction.HasResponded)
+            {
+                await FollowupAsync(message, ephemeral: ephemeral);
+            }
+            else
+            {
+                await RespondAsync(message, ephemeral: ephemeral);
+            }
         }
     }
 }
