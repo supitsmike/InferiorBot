@@ -55,7 +55,7 @@ namespace InferiorBot.Classes
             if (string.IsNullOrEmpty(type) && host.Equals(tiktokUrls["tiktok"], StringComparison.OrdinalIgnoreCase))
             {
                 website = "tiktok";
-                type = "vxTiktok";
+                type = "EmbedEZ";
             }
             if (string.IsNullOrEmpty(type) && host.Equals(redditUrls["reddit"], StringComparison.OrdinalIgnoreCase))
             {
