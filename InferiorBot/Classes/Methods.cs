@@ -79,7 +79,7 @@ namespace InferiorBot.Classes
                     if (instagramUrls.DoesValueExist(host, type))
                     {
                         subdomain = "www";
-                        host = "okinstagram.com";
+                        host = "oginstagram.com";
                         break;
                     }
                     subdomain = string.Empty;
