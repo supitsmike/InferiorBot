@@ -79,7 +79,7 @@ namespace InferiorBot.Handlers
                 case "instagram":
                     componentBuilder
                         .WithButton("Instagram", "convert_url:instagram", ButtonStyle.Secondary)
-                        .WithButton("InstaFix", "convert_url:InstaFix", ButtonStyle.Secondary)
+                        .WithButton("OGInstagram", "convert_url:OGInstagram", ButtonStyle.Secondary)
                         .WithButton("EmbedEZ", "convert_url:EmbedEZ", ButtonStyle.Secondary)
                         .WithButton("Delete", "delete_message", ButtonStyle.Danger);
                     break;
