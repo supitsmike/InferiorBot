@@ -50,7 +50,7 @@ namespace InferiorBot.Classes
                                                host.Equals(twitterUrls["twitter"], StringComparison.OrdinalIgnoreCase)))
             {
                 website = "twitter";
-                type = "TwitFix";
+                type = "EmbedEZ";
             }
             if (string.IsNullOrEmpty(type) && host.Equals(tiktokUrls["tiktok"], StringComparison.OrdinalIgnoreCase))
             {
